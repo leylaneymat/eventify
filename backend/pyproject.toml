@@ -1,0 +1,13 @@
+[project]
+name = "src"
+version = "v1.0"
+description = "Project for Intro to Software Engineering course (Fall 2025)"
+authors = [{name = "Leyla Neymat", email = "leyla.neymat@proton.me"}, {name = "Ilqar Malikov", email = "imalikov13943@ada.edu.az"}, {name = "Firangiz Bakirli", email = "fbakirli17945@ada.edu.az"}, {name = "Elvin Hayatov", email = "ehayatov@ada.edu.az"}]
+readme = "README.md"
+requires-python = ">= 3.12"
+dependencies = [
+  "django",
+  "djangorestframework",
+  "drf-yasg",
+  "djangorestframework-simplejwt",
+]
