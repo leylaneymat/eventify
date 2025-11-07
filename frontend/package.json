@@ -1,0 +1,22 @@
+{
+  "name": "eventfy",
+  "version": "1.0.0",
+  "description": "Project for Intro to Software Engineering course (Fall 2025)",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leylaneymat/eventify.git"
+  },
+  "keywords": [
+    "eventfy"
+  ],
+  "author": "Leyla Neymat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leylaneymat/eventify/issues"
+  },
+  "homepage": "https://github.com/leylaneymat/eventify#readme"
+}
