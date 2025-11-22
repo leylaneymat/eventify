@@ -1,22 +1,18 @@
 {
-  "name": "eventfy",
-  "version": "1.0.0",
-  "description": "Project for Intro to Software Engineering course (Fall 2025)",
-  "main": "main.js",
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/leylaneymat/eventify.git"
+  "dependencies": {
+    "vue": "^3.5.24"
   },
-  "keywords": [
-    "eventfy"
-  ],
-  "author": "Leyla Neymat",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/leylaneymat/eventify/issues"
-  },
-  "homepage": "https://github.com/leylaneymat/eventify#readme"
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "vite": "^7.2.4"
+  }
 }
