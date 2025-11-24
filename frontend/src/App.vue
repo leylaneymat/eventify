@@ -3,6 +3,21 @@ import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
+  <Header />
+
+  <div class="event-card-menu">
+    <div class="event-cards-container">
+      <EventCard v-for="event in events" :key="event.id" :event="event" />
+    </div>
+  </div>
+
+  <Footer />
+</template>
+
+<script>
+import Header from '@/components/Header.vue'
+
+<template>
   <div>
     <a href="https://vite.dev" target="_blank">
       <img src="/vite.svg" class="logo" alt="Vite logo" />
