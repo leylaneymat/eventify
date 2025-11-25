@@ -37,12 +37,27 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useUserStore } from '@/stores/userStore'
+import { ElMessage } from 'element-plus'
+
+const userStore = useUserStore()
 
 const loginDialogVisible = ref(false)
 const registerDialogVisible = ref(false)
 
 const openLoginModal = () => loginDialogVisible.value = true
 const openRegisterModal = () => registerDialogVisible.value = true
+
+const submitLogin = async () => {
+  const success = await userStore.login(loginForm.value.username, loginForm.value.password)
+  if (success) {
+    ElMessage.success('Login successful')
+    loginDialogVisible.value = false
+  } else {
+    ElMessage.error('Login failed')
+  }
+}
+
 </script>
 
 <style scoped>
