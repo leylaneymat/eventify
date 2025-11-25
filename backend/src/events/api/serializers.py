@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from events.models import Ticket
+from events.models import Comment, Ticket
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -13,3 +13,15 @@ class TicketSerializer(serializers.ModelSerializer):
             "event",
         )
         read_only_fields = ("event",)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "text",
+            "event",
+            "user",
+        )
+        read_only_fields = ("event", "user")
