@@ -17,7 +17,7 @@
       </template>
     </div>
   
-  <el-dialog v-model="purchasedTicketsDialogVisible" title="Purchased Tickets" width="700px">
+    <el-dialog v-model="purchasedTicketsDialogVisible" title="Purchased Tickets" width="700px">
       <div v-if="loading" class="loading-container">
         <el-icon class="is-loading">
           <Loading />
@@ -43,28 +43,39 @@
       </el-table>
     </el-dialog>
 
-  <el-dialog v-model="loginDialogVisible" title="Login" width="500px">
-  <el-form :model="loginForm">
-    <el-form-item label="Username">
-      <el-input v-model="loginForm.username" />
-    </el-form-item>
-    <el-form-item label="Password">
-      <el-input v-model="loginForm.password" type="password" />
-    </el-form-item>
-    <el-button type="primary">Login</el-button>
-  </el-form>
-</el-dialog>
+    <el-dialog v-model="loginDialogVisible" title="Login" width="500px">
+      <el-form :model="loginForm" label-width="120px">
+        <el-form-item label="Username">
+          <el-input v-model="loginForm.username" placeholder="Enter your username" />
+        </el-form-item>
+        <el-form-item label="Password">
+          <el-input v-model="loginForm.password" type="password" placeholder="Enter your password" show-password />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitLogin">Login</el-button>
+          <el-button class="cancel-button" @click="loginDialogVisible = false">Cancel</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
 
-<el-dialog v-model="registerDialogVisible" title="Register" width="500px">
-  <el-form :model="registerForm">
-    <el-form-item label="Username">
-      <el-input v-model="registerForm.username" />
-    </el-form-item>
-    <el-form-item label="Password">
-      <el-input v-model="registerForm.password" type="password" />
-    </el-form-item>
-  </el-form>
-</el-dialog>
+    <el-dialog v-model="registerDialogVisible" title="Register" width="500px">
+      <el-form :model="registerForm" label-width="120px">
+        <el-form-item label="Username">
+          <el-input v-model="registerForm.username" placeholder="Choose a username" />
+        </el-form-item>
+        <el-form-item label="Password">
+          <el-input v-model="registerForm.password" type="password" placeholder="Create a password" show-password />
+        </el-form-item>
+        <el-form-item label="Confirm">
+          <el-input v-model="registerForm.confirmPassword" type="password" placeholder="Confirm your password"
+            show-password />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitRegister">Register</el-button>
+          <el-button class="cancel-button" @click="registerDialogVisible = false">Cancel</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
 
 </div>
 </template>
