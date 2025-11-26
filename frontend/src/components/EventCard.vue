@@ -1,51 +1,25 @@
 <template>
   <div class="event-card">
-    <div class="card-header">
-      <h3>{{ event.name }}</h3>
+    <h3 class="event-title">{{ event.name }}</h3>
+    <p class="event-description">{{ event.description }}</p>
 
-      <button class="like-btn" @click="toggleLike">
-        <span v-if="isLiked">★</span>
-        <span v-else>☆</span>
-        {{ likeCount }}
-      </button>
+    <div class="ticket-info">
+      <h4>Tickets</h4>
+      <ul>
+        <li v-for="ticket in event.tickets" :key="ticket.id">
+          {{ ticket.name }} — ${{ ticket.price }}
+        </li>
+      </ul>
     </div>
-
-    <p>{{ event.description }}</p>
   </div>
 </template>
 
 <script>
-import { ref, watch } from 'vue'
-
 export default {
   props: {
     event: {
       type: Object,
       required: true
-    }
-  },
-  setup(props) {
-    const isLiked = ref(props.event.isLiked || false)
-    const likeCount = ref(props.event.likes || 0)
-
-    watch(
-      () => props.event,
-      () => {
-        isLiked.value = props.event.isLiked || false
-        likeCount.value = props.event.likes || 0
-      },
-      { deep: true }
-    )
-
-    const toggleLike = () => {
-      isLiked.value = !isLiked.value
-      likeCount.value += isLiked.value ? 1 : -1
-    }
-
-    return {
-      isLiked,
-      likeCount,
-      toggleLike
     }
   }
 }
@@ -54,21 +28,27 @@ export default {
 <style scoped>
 .event-card {
   border: 1px solid #ddd;
-  padding: 16px;
+  padding: 20px;
   border-radius: 12px;
   background: white;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.event-title {
+  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 600;
 }
 
-.like-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
+.event-description {
+  margin-bottom: 16px;
+  color: #444;
+}
+
+.ticket-info ul {
+  padding-left: 20px;
+}
+
+.ticket-info li {
+  margin-bottom: 6px;
 }
 </style>
