@@ -1,10 +1,16 @@
+from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 
-from events.api.serializers import CommentSerializer, TicketSerializer
-from events.models import Comment, Event, Ticket
+from events.api.serializers import (
+    CommentSerializer,
+    EventSerializer,
+    LikeSerializer,
+    TicketSerializer,
+)
+from events.models import Comment, Event, Like, Ticket
 from events.permissions import IsAdminOrIsOwnerOrReadOnly, IsAdminOrReadOnly
 
 
@@ -55,3 +61,42 @@ class CommentViewSet(viewsets.ModelViewSet):
         user = self.request.user
         event = get_object_or_404(Event, pk=event_id)
         serializer.save(event=event, user=user)
+
+
+class LikeViewSet(viewsets.ModelViewSet):
+    serializer_class = LikeSerializer
+    lookup_url_kwarg = "like_pk"
+    permission_classes = [IsAdminOrIsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        event_id = self.kwargs["event_pk"]
+        event = get_object_or_404(Event, pk=event_id)
+        likes = Like.objects.filter(event_id=event_id)
+
+        if not event and not likes:
+            raise NotFound()
+
+        return likes
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.check_object_permissions(request, instance)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        event_id = self.kwargs["event_pk"]
+        event = get_object_or_404(Event, pk=event_id)
+
+        try:
+            serializer.save(event=event, user=user)
+        except IntegrityError:
+            raise ValidationError("You have already liked this event.")
+
+
+class EventViewSet(viewsets.ModelViewSet):
+    serializer_class = EventSerializer
+    queryset = Event.objects.all()
+    lookup_url_kwarg = "event_pk"
+    permission_classes = [IsAdminOrReadOnly]
