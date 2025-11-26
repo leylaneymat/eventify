@@ -121,8 +121,36 @@ const showPurchased = async () => {
 .header {
   background-color: #409eff;
   color: white;
-  padding: 16px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.app-name {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  column-gap: 16px;
+}
+
+.el-button {
+  color: white;
+}
+
+.cancel-button {
+  color: black;
 }
 </style>
