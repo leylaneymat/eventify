@@ -84,17 +84,42 @@
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/userStore'
 import { ElMessage } from 'element-plus'
+import axios from 'axios';
 
 const userStore = useUserStore()
 
 const loginDialogVisible = ref(false)
 const registerDialogVisible = ref(false)
 
-const openLoginModal = () => loginDialogVisible.value = true
-const openRegisterModal = () => registerDialogVisible.value = true
+const loginForm = ref({
+  username: '',
+  password: ''
+})
+
+const registerForm = ref({
+  username: '',
+  password: '',
+  confirmPassword: ''
+})
+
+const openLoginModal = () => {
+  loginDialogVisible.value = true
+}
+
+const openRegisterModal = () => {
+  registerDialogVisible.value = true
+}
 
 const submitLogin = async () => {
-  const success = await userStore.login(loginForm.value.username, loginForm.value.password)
+  const { username, password } = loginForm.value
+
+  if (!username || !password) {
+    ElMessage.error('Please enter username and password')
+    return
+  }
+
+  const success = await userStore.login(username, password)
+
   if (success) {
     ElMessage.success('Login successful')
     loginDialogVisible.value = false
@@ -103,18 +128,70 @@ const submitLogin = async () => {
   }
 }
 
+const submitRegister = async () => {
+  const { username, password, confirmPassword } = registerForm.value
+
+  if (!username || !password) {
+    ElMessage.error('Please enter username and password')
+    return
+  }
+
+  if (password !== confirmPassword) {
+    ElMessage.error('Passwords do not match')
+    return
+  }
+
+  const success = await userStore.register(username, password)
+
+  if (success) {
+    ElMessage.success('Registration successful')
+    registerDialogVisible.value = false
+  } else {
+    ElMessage.error('Registration failed')
+  }
+}
+
 const purchasedTicketsDialogVisible = ref(false)
 const purchasedTickets = ref([])
 const loading = ref(false)
 
 const showPurchased = async () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('Please login first')
+    return
+  }
+
+  purchasedTickets.value = []
   purchasedTicketsDialogVisible.value = true
   loading.value = true
-  const result = await axios.get(`http://localhost:8000/api/v1/users/${userStore.user.id}/purchased_tickets/`)
-  purchasedTickets.value = result.data
-  loading.value = false
-}
 
+  try {
+    const purchased_tickets = (await axios.get(`http://localhost:8000/api/v1/users/${userStore.user.id}/purchased_tickets/`)).data
+
+    for (let i = 0; i < purchased_tickets.length; i++) {
+      const selected_event = (await axios.get(`http://localhost:8000/api/v1/events/${purchased_tickets[i].event}/`)).data
+      const selected_ticket = (await axios.get(`http://localhost:8000/api/v1/events/${purchased_tickets[i].event}/tickets/${purchased_tickets[i].ticket}/`)).data
+      purchasedTickets.value.push({
+        'id': purchased_tickets[i].id,
+        'purchaseDate': purchased_tickets[i].purchase_date,
+        'event': {
+          'id': selected_event.id,
+          'name': selected_event.name
+        },
+        'ticket': {
+          'id': selected_ticket.id,
+          'name': selected_ticket.name,
+          'price': selected_ticket.price
+        }
+      })
+    }
+  } catch (error) {
+    ElMessage.error('Failed to load purchased tickets')
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <style scoped>
