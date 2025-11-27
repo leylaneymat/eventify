@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from users.models import User
+from users.models import PurchasedTicket, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -28,3 +28,16 @@ class UserSerializer(serializers.ModelSerializer):
             **validated_data, password=password
         )
         return user
+
+
+class PurchasedTicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PurchasedTicket
+        fields = (
+            "id",
+            "event",
+            "ticket",
+            "user",
+            "purchase_date",
+        )
+        read_only_fields = ("user", "purchase_date")
