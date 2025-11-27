@@ -33,40 +33,46 @@
 
 
 <script>
+import { ref } from 'vue'
+import { Star, StarFilled } from '@element-plus/icons-vue'
+
 export default {
   props: {
-    event: {
-      type: Object,
-      required: true
+    event: { type: Object, required: true }
+  },
+  setup(props) {
+    const toggleLike = () => {
+      props.event.isLiked = !props.event.isLiked
+      props.event.likes =
+        (props.event.likes || 0) + (props.event.isLiked ? 1 : -1)
     }
-  }
+
+    return { toggleLike }
+  },
+  components: { Star, StarFilled }
 }
 </script>
 
+
 <style scoped>
 .event-card {
-  border: 1px solid #ddd;
-  padding: 20px;
-  border-radius: 12px;
-  background: white;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 24px;
 }
 
-.event-title {
-  margin-bottom: 8px;
-  font-size: 20px;
-  font-weight: 600;
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.event-description {
-  margin-bottom: 16px;
-  color: #444;
+.header-actions {
+  display: flex;
+  gap: 12px;
 }
 
-.ticket-info ul {
-  padding-left: 20px;
-}
-
-.ticket-info li {
-  margin-bottom: 6px;
+.ticket-list {
+  margin-top: 16px;
 }
 </style>
