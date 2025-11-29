@@ -1,22 +1,27 @@
 <template>
   <el-card class="event-card">
+
+    <!-- HEADER -->
     <template #header>
       <div class="card-header">
         <h3>{{ event.name }}</h3>
+
         <div class="header-actions">
           <el-button type="text" @click="toggleLike">
-            <el-icon v-if="event.isLiked">
-              <StarFilled />
-            </el-icon>
-            <el-icon v-else>
-              <Star />
-            </el-icon>
+            <el-icon v-if="event.isLiked"><StarFilled /></el-icon>
+            <el-icon v-else><Star /></el-icon>
             {{ event.likes || 0 }}
+          </el-button>
+
+          <el-button type="text" @click="showComments = true">
+            <el-icon><ChatRound /></el-icon>
+            {{ event.comments.length || 0 }}
           </el-button>
         </div>
       </div>
     </template>
 
+    <!-- CONTENT -->
     <div class="card-content">
       <p>{{ event.description }}</p>
 
@@ -28,31 +33,85 @@
         </el-table>
       </div>
     </div>
+
+    <!-- COMMENTS DIALOG -->
+    <el-dialog v-model="showComments" title="Event Comments">
+      <div class="comment-list">
+
+        <div class="comment-header">
+          <el-input
+            class="comment-box"
+            v-model="newComment"
+            placeholder="Add a comment"
+          />
+          <el-button type="primary" @click="addComment">
+            Add
+          </el-button>
+        </div>
+
+        <div
+          v-for="(comment, idx) in event.comments"
+          :key="idx"
+          class="comment-item"
+        >
+          <div class="comment-header">
+            <span class="commenter">{{ comment.author }}</span>
+            <span class="comment-date">{{ comment.createdAt }}</span>
+          </div>
+          <div class="comment-content">{{ comment.text }}</div>
+        </div>
+
+      </div>
+    </el-dialog>
+
   </el-card>
 </template>
 
-
 <script>
-import { ref } from 'vue'
-import { Star, StarFilled } from '@element-plus/icons-vue'
+import { ref } from "vue";
+import { Star, StarFilled, ChatRound } from "@element-plus/icons-vue";
 
 export default {
   props: {
-    event: { type: Object, required: true }
+    event: { type: Object, required: true },
   },
+
   setup(props) {
+    // LIKE BUTTON (already added in previous commit)
     const toggleLike = () => {
-      props.event.isLiked = !props.event.isLiked
+      props.event.isLiked = !props.event.isLiked;
       props.event.likes =
-        (props.event.likes || 0) + (props.event.isLiked ? 1 : -1)
-    }
+        (props.event.likes || 0) + (props.event.isLiked ? 1 : -1);
+    };
 
-    return { toggleLike }
+    // COMMENT UI LOGIC
+    const showComments = ref(false);
+    const newComment = ref("");
+
+    const addComment = () => {
+      if (!newComment.value.trim()) return;
+
+      props.event.comments.push({
+        id: Date.now(),
+        author: "Guest",
+        createdAt: new Date().toLocaleDateString(),
+        text: newComment.value,
+      });
+
+      newComment.value = "";
+    };
+
+    return {
+      toggleLike,
+      showComments,
+      newComment,
+      addComment,
+    };
   },
-  components: { Star, StarFilled }
-}
-</script>
 
+  components: { Star, StarFilled, ChatRound },
+};
+</script>
 
 <style scoped>
 .event-card {
@@ -74,5 +133,31 @@ export default {
 
 .ticket-list {
   margin-top: 16px;
+}
+
+/* COMMENT UI */
+.comment-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.comment-box {
+  width: 80%;
+}
+
+.comment-item {
+  padding: 12px;
+  border-bottom: 1px solid #e4e7ed;
+}
+
+.comment-content {
+  margin-top: 4px;
+  font-size: 15px;
 }
 </style>
