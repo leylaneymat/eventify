@@ -4,7 +4,7 @@
         <span>Made with</span>
         <span class="mx-1">❤️</span>
         <a
-          href="https://github.com/leylaneymat"
+          href="https://github.com/leylaneymat/eventify"
           target="_blank"
           class="font-medium hover:underline text-blue-600 dark:text-blue-400"
         >
