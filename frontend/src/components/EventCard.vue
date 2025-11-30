@@ -17,6 +17,10 @@
             <el-icon><ChatRound /></el-icon>
             {{ event.comments.length || 0 }}
           </el-button>
+
+          <el-button type="primary" @click="showPurchase = true">
+            Buy Ticket
+          </el-button>
         </div>
       </div>
     </template>
@@ -64,6 +68,40 @@
       </div>
     </el-dialog>
 
+    <!-- TICKET PURCHASE DIALOG -->
+    <el-dialog v-model="showPurchase" title="Purchase Ticket" width="500px">
+      <div class="purchase-container">
+
+        <el-form>
+          <el-form-item label="Select Ticket">
+            <el-select
+              v-model="selectedTicket"
+              placeholder="Choose ticket"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="ticket in event.tickets"
+                :key="ticket.id"
+                :label="`${ticket.name} - $${ticket.price}`"
+                :value="ticket.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+
+        <div class="purchase-actions">
+          <el-button
+            type="primary"
+            :disabled="!selectedTicket"
+            @click="simulatePurchase"
+          >
+            Buy
+          </el-button>
+        </div>
+
+      </div>
+    </el-dialog>
+
   </el-card>
 </template>
 
@@ -77,14 +115,14 @@ export default {
   },
 
   setup(props) {
-    // LIKE BUTTON (already added in previous commit)
+    /* LIKE BUTTON */
     const toggleLike = () => {
       props.event.isLiked = !props.event.isLiked;
       props.event.likes =
         (props.event.likes || 0) + (props.event.isLiked ? 1 : -1);
     };
 
-    // COMMENT UI LOGIC
+    /* COMMENTS */
     const showComments = ref(false);
     const newComment = ref("");
 
@@ -101,11 +139,25 @@ export default {
       newComment.value = "";
     };
 
+    /* PURCHASE DIALOG (UI ONLY) */
+    const showPurchase = ref(false);
+    const selectedTicket = ref(null);
+
+    const simulatePurchase = () => {
+      alert("Ticket purchased (UI only)");
+      showPurchase.value = false;
+      selectedTicket.value = null;
+    };
+
     return {
       toggleLike,
       showComments,
       newComment,
       addComment,
+
+      showPurchase,
+      selectedTicket,
+      simulatePurchase,
     };
   },
 
@@ -159,5 +211,11 @@ export default {
 .comment-content {
   margin-top: 4px;
   font-size: 15px;
+}
+
+/* PURCHASE UI */
+.purchase-actions {
+  margin-top: 20px;
+  text-align: right;
 }
 </style>
