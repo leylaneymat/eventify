@@ -17,10 +17,6 @@
             <el-icon><ChatRound /></el-icon>
             {{ event.comments.length || 0 }}
           </el-button>
-
-          <el-button type="primary" @click="showPurchase = true">
-            Buy Ticket
-          </el-button>
         </div>
       </div>
     </template>
@@ -37,6 +33,15 @@
         </el-table>
       </div>
     </div>
+
+    <!-- FOOTER -->
+    <template #footer>
+      <div class="card-footer">
+        <el-button type="primary" @click="showPurchase = true">
+          Buy Ticket
+        </el-button>
+      </div>
+    </template>
 
     <!-- COMMENTS DIALOG -->
     <el-dialog v-model="showComments" title="Event Comments">
@@ -68,15 +73,15 @@
       </div>
     </el-dialog>
 
-    <!-- TICKET PURCHASE DIALOG -->
+    <!-- PURCHASE DIALOG (UI FINAL VERSION) -->
     <el-dialog v-model="showPurchase" title="Purchase Ticket" width="500px">
-      <div class="purchase-container">
-
+      <div class="ticket-purchase-container">
+        
         <el-form>
           <el-form-item label="Select Ticket">
             <el-select
               v-model="selectedTicket"
-              placeholder="Choose ticket"
+              placeholder="Choose a ticket"
               style="width: 100%"
             >
               <el-option
@@ -84,7 +89,12 @@
                 :key="ticket.id"
                 :label="`${ticket.name} - $${ticket.price}`"
                 :value="ticket.id"
-              />
+              >
+                <div class="ticket-option">
+                  <span>{{ ticket.name }}</span>
+                  <span class="ticket-price">${{ ticket.price }}</span>
+                </div>
+              </el-option>
             </el-select>
           </el-form-item>
         </el-form>
@@ -139,7 +149,7 @@ export default {
       newComment.value = "";
     };
 
-    /* PURCHASE DIALOG (UI ONLY) */
+    /* PURCHASE UI */
     const showPurchase = ref(false);
     const selectedTicket = ref(null);
 
@@ -187,6 +197,13 @@ export default {
   margin-top: 16px;
 }
 
+/* FOOTER */
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+}
+
 /* COMMENT UI */
 .comment-list {
   max-height: 300px;
@@ -214,6 +231,21 @@ export default {
 }
 
 /* PURCHASE UI */
+.ticket-purchase-container {
+  padding: 20px;
+}
+
+.ticket-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ticket-price {
+  color: #67c23a;
+  font-weight: bold;
+}
+
 .purchase-actions {
   margin-top: 20px;
   text-align: right;
