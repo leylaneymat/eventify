@@ -20,7 +20,6 @@
         </div>
       </div>
     </template>
-
     <!-- CONTENT -->
     <div class="card-content">
       <p>{{ event.description }}</p>
@@ -33,7 +32,6 @@
         </el-table>
       </div>
     </div>
-
     <!-- FOOTER -->
     <template #footer>
       <div class="card-footer">
@@ -46,16 +44,13 @@
     <!-- COMMENTS DIALOG -->
     <el-dialog v-model="showComments" title="Event Comments">
       <div class="comment-list">
-
         <div class="comment-header">
           <el-input
             class="comment-box"
             v-model="newComment"
             placeholder="Add a comment"
           />
-          <el-button type="primary" @click="addComment">
-            Add
-          </el-button>
+          <el-button type="primary" @click="addComment">Add</el-button>
         </div>
 
         <div
@@ -69,46 +64,28 @@
           </div>
           <div class="comment-content">{{ comment.text }}</div>
         </div>
-
       </div>
     </el-dialog>
 
     <!-- PURCHASE DIALOG (UI FINAL VERSION) -->
     <el-dialog v-model="showPurchase" title="Purchase Ticket" width="500px">
       <div class="ticket-purchase-container">
-        
         <el-form>
           <el-form-item label="Select Ticket">
-            <el-select
-              v-model="selectedTicket"
-              placeholder="Choose a ticket"
-              style="width: 100%"
-            >
+            <el-select v-model="selectedTicket" placeholder="Choose a ticket" style="width: 100%">
               <el-option
                 v-for="ticket in event.tickets"
                 :key="ticket.id"
                 :label="`${ticket.name} - $${ticket.price}`"
                 :value="ticket.id"
-              >
-                <div class="ticket-option">
-                  <span>{{ ticket.name }}</span>
-                  <span class="ticket-price">${{ ticket.price }}</span>
-                </div>
-              </el-option>
+              />
             </el-select>
           </el-form-item>
         </el-form>
 
         <div class="purchase-actions">
-          <el-button
-            type="primary"
-            :disabled="!selectedTicket"
-            @click="simulatePurchase"
-          >
-            Buy
-          </el-button>
+          <el-button type="primary" :disabled="!selectedTicket" @click="simulatePurchase">Buy</el-button>
         </div>
-
       </div>
     </el-dialog>
 
@@ -125,16 +102,17 @@ export default {
   },
 
   setup(props) {
-    /* LIKE BUTTON */
-    const toggleLike = () => {
-      props.event.isLiked = !props.event.isLiked;
-      props.event.likes =
-        (props.event.likes || 0) + (props.event.isLiked ? 1 : -1);
-    };
-
-    /* COMMENTS */
+     /* COMMENTS */
+     /* PURCHASE UI */
     const showComments = ref(false);
     const newComment = ref("");
+    const showPurchase = ref(false);
+    const selectedTicket = ref(null);
+
+    const toggleLike = () => {
+      props.event.isLiked = !props.event.isLiked;
+      props.event.likes = (props.event.likes || 0) + (props.event.isLiked ? 1 : -1);
+    };
 
     const addComment = () => {
       if (!newComment.value.trim()) return;
@@ -149,10 +127,6 @@ export default {
       newComment.value = "";
     };
 
-    /* PURCHASE UI */
-    const showPurchase = ref(false);
-    const selectedTicket = ref(null);
-
     const simulatePurchase = () => {
       alert("Ticket purchased (UI only)");
       showPurchase.value = false;
@@ -164,7 +138,6 @@ export default {
       showComments,
       newComment,
       addComment,
-
       showPurchase,
       selectedTicket,
       simulatePurchase,
@@ -178,8 +151,7 @@ export default {
 <style scoped>
 .event-card {
   width: 100%;
-  max-width: 600px;
-  margin-bottom: 24px;
+  min-height: 300px;
 }
 
 .card-header {
@@ -193,15 +165,13 @@ export default {
   gap: 12px;
 }
 
-.ticket-list {
-  margin-top: 16px;
-}
-
-/* FOOTER */
 .card-footer {
   display: flex;
   justify-content: flex-end;
-  padding-top: 16px;
+}
+
+.ticket-list {
+  margin-top: 16px;
 }
 
 /* COMMENT UI */
@@ -209,43 +179,15 @@ export default {
   max-height: 300px;
   overflow-y: auto;
 }
-
-.comment-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.comment-box {
-  width: 80%;
-}
-
 .comment-item {
   padding: 12px;
   border-bottom: 1px solid #e4e7ed;
-}
-
-.comment-content {
-  margin-top: 4px;
-  font-size: 15px;
 }
 
 /* PURCHASE UI */
 .ticket-purchase-container {
   padding: 20px;
 }
-
-.ticket-option {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.ticket-price {
-  color: #67c23a;
-  font-weight: bold;
-}
-
 .purchase-actions {
   margin-top: 20px;
   text-align: right;
