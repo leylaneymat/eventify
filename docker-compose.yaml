@@ -10,7 +10,7 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./backend/src:/app
+      - ./backend/src/db.sqlite3:/src/db.sqlite3
     command: python manage.py runserver 0.0.0.0:8000
 
   frontend:
