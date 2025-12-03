@@ -3,6 +3,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+
 
 from events.api.serializers import (
     CommentSerializer,
@@ -99,4 +101,5 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
     queryset = Event.objects.all()
     lookup_url_kwarg = "event_pk"
+    renderer_classes = [JSONRenderer]
     permission_classes = [IsAdminOrReadOnly]
