@@ -37,7 +37,7 @@ class PurchasedTicketViewSet(viewsets.ModelViewSet):
 
         if (
             not self.request.user.is_staff
-            and user != self.request_user
+            and user != self.request.user
             or not self.request.user.is_authenticated
         ):
             raise PermissionDenied()
