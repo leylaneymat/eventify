@@ -20,7 +20,7 @@ export default {
   },
 
   async created() {
-    const res = await api.get("/events/");
+    const res = await api.get("api/v1/events/");
     this.events = res.data;
   }
 };

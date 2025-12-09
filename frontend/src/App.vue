@@ -25,7 +25,7 @@ const events = ref([])
 
 onMounted(async () => {
   try {
-    const res = await api.get("/events/")
+    const res = await api.get("/api/v1/events/")
     events.value = res.data
   } catch (err) {
     console.error("Error loading events:", err)

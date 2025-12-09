@@ -22,6 +22,9 @@ export const useUserStore = defineStore("user", {
 				this.accessToken = response.data.access;
 				this.refreshToken = response.data.refresh;
 
+				axios.defaults.headers.common["Authorization"] =
+					`Bearer ${this.accessToken}`;
+
 				const userData = (
 					await axios.get(
 						`http://localhost:8000/api/v1/users/${username}/`,
@@ -33,9 +36,6 @@ export const useUserStore = defineStore("user", {
 					username: userData.username,
 				};
 				this.isLoggedIn = true;
-
-				axios.defaults.headers.common["Authorization"] =
-					`Bearer ${this.accessToken}`;
 
 				localStorage.setItem("user", JSON.stringify(this.user));
 				localStorage.setItem("accessToken", this.accessToken);

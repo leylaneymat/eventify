@@ -37,4 +37,3 @@ typing-extensions==4.15.0
     # via asgiref
 uritemplate==4.2.0
     # via drf-yasg
-django-cors-headers
