@@ -23,7 +23,9 @@
     <!-- CONTENT -->
     <div class="card-content">
       <p>{{ event.description }}</p>
-
+      <p>
+        {{ new Date(event.date).toLocaleString() }}
+      </p>
       <div class="ticket-list">
         <h4>Tickets</h4>
         <el-table :data="event.tickets" style="width: 100%">
