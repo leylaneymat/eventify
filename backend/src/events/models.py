@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 from users.models import User
@@ -41,3 +42,24 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class SavedEvent(models.Model):
+    """Track events saved by users"""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="saved_events"
+    )
+    event = models.ForeignKey(
+        "Event",  # Assuming your Event model is named 'Event'
+        on_delete=models.CASCADE,
+        related_name="saved_by_users",
+    )
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "event")
+        ordering = ["-saved_at"]
+
+    def __str__(self):
+        return f"{self.user.name} saved {self.event.name}"

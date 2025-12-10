@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from events.models import Comment, Event, Like, Ticket
+from events.models import Comment, Event, Like, SavedEvent, Ticket
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -67,3 +67,53 @@ class LikeSerializer(serializers.ModelSerializer):
             "user",
         )
         read_only_fields = ("event", "user")
+
+
+class SavedEventSerializer(serializers.ModelSerializer):
+    """Serializer for saving/unsaving events"""
+
+    event_id = serializers.IntegerField(write_only=True)
+    event = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = SavedEvent
+        fields = ["id", "event_id", "event", "saved_at"]
+        read_only_fields = ["id", "saved_at"]
+
+    def get_event(self, obj):
+        # Import your existing EventSerializer here
+        from events.api.serializers import EventSerializer
+
+        return EventSerializer(obj.event).data
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        event_id = validated_data.pop("event_id")
+
+        try:
+            event = Event.objects.get(id=event_id)
+        except Event.DoesNotExist:
+            raise serializers.ValidationError({"event_id": "Event not found"})
+
+        saved_event, created = SavedEvent.objects.get_or_create(user=user, event=event)
+
+        if not created:
+            raise serializers.ValidationError({"detail": "Event already saved"})
+
+        return saved_event
+
+
+class SavedEventListSerializer(serializers.ModelSerializer):
+    """Serializer for listing saved events"""
+
+    event = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SavedEvent
+        fields = ["id", "event", "saved_at"]
+
+    def get_event(self, obj):
+        # Import your existing EventSerializer here
+        from events.api.serializers import EventSerializer
+
+        return EventSerializer(obj.event).data
