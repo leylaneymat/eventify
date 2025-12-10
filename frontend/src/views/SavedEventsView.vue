@@ -25,9 +25,9 @@
 
     <!-- Events List -->
     <div v-else class="saved-events-container">
-      <EventCard 
-        v-for="savedEvent in savedEvents" 
-        :key="savedEvent.id" 
+      <EventCard
+        v-for="savedEvent in savedEvents"
+        :key="savedEvent.id"
         :event="savedEvent.event"
         @unsaved="handleUnsaved"
       />

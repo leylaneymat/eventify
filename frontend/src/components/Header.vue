@@ -11,7 +11,7 @@
         <el-button type="text" @click="showPurchased">Purchased tickets</el-button>
         |
         <span>{{ userStore.user?.username }}</span>
-        <el-button type="text" @click="userStore.logout">Logout</el-button>
+        <el-button type="text" @click="handleLogout">Logout</el-button>
       </template>
       <template v-else>
         <el-button type="text" @click="openLoginModal">Login</el-button>
@@ -127,6 +127,7 @@ const submitLogin = async () => {
   if (success) {
     ElMessage.success('Login successful')
     loginDialogVisible.value = false
+	  router.go(0);
   } else {
     ElMessage.error('Login failed')
   }
@@ -150,6 +151,7 @@ const submitRegister = async () => {
   if (success) {
     ElMessage.success('Registration successful')
     registerDialogVisible.value = false
+    router.go(0);
   } else {
     ElMessage.error('Registration failed')
   }
@@ -195,6 +197,12 @@ const showPurchased = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handleLogout = () => {
+  userStore.logout();
+  ElMessage.success('Logged out successfully');
+  router.go(0);
 }
 
 const goToHome = () => {

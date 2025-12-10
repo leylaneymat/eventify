@@ -120,7 +120,8 @@ export default {
       required: true
     }
   },
-  setup(props) {
+  emits: ['unsaved'],
+  setup(props, { emit }) {
     const showComments = ref(false);
     const newComment = ref('');
     const userStore = useUserStore();
@@ -147,7 +148,10 @@ export default {
 
       try {
         if (isSaved.value) {
-          await userStore.unsaveEvent(props.event.id);
+          const result = await userStore.unsaveEvent(props.event.id);
+          if (result) {
+             emit('unsaved', props.event.id); // Add this line
+          }
           isSaved.value = false;
           ElMessage.success('Event removed from saved list');
         } else {
