@@ -17,6 +17,12 @@
             <el-icon><ChatRound /></el-icon>
             {{ event.comments.length || 0 }}
           </el-button>
+
+          <!-- SAVE BUTTON -->
+          <el-button type="text" @click="toggleSave" :title="isSaved ? 'Unsave event' : 'Save event'">
+            <el-icon v-if="isSaved" class="saved-icon"><CollectionTag /></el-icon>
+            <el-icon v-else><Collection /></el-icon>
+          </el-button>
         </div>
       </div>
     </template>
@@ -101,8 +107,8 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { Star, StarFilled, ChatRound } from '@element-plus/icons-vue';
+import { ref, onMounted } from 'vue';
+import { Star, StarFilled, ChatRound, Collection, CollectionTag } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/userStore';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
@@ -120,6 +126,40 @@ export default {
     const userStore = useUserStore();
     const showTicketPurchaseDialog = ref(false);
     const selectedTicket = ref(null);
+    const isSaved = ref(false);
+
+    // Check if event is saved on mount
+    const checkSavedStatus = async () => {
+      if (userStore.isLoggedIn) {
+        isSaved.value = await userStore.checkEventSaved(props.event.id);
+      }
+    };
+
+    onMounted(() => {
+      checkSavedStatus();
+    });
+
+    const toggleSave = async () => {
+      if (!userStore.isLoggedIn) {
+        ElMessage.warning('Please login to save events');
+        return;
+      }
+
+      try {
+        if (isSaved.value) {
+          await userStore.unsaveEvent(props.event.id);
+          isSaved.value = false;
+          ElMessage.success('Event removed from saved list');
+        } else {
+          await userStore.saveEvent(props.event.id);
+          isSaved.value = true;
+          ElMessage.success('Event saved successfully');
+        }
+      } catch (error) {
+        ElMessage.error('Failed to update saved status');
+        console.error(error);
+      }
+    };
 
     const toggleLike = async () => {
       if (!userStore.isLoggedIn) {
@@ -217,13 +257,17 @@ export default {
       showTicketPurchaseDialog,
       selectedTicket,
       openTicketPurchaseDialog,
-      buyTicket
+      buyTicket,
+      isSaved,
+      toggleSave
     };
   },
   components: {
     Star,
     StarFilled,
-    ChatRound
+    ChatRound,
+    Collection,
+    CollectionTag
   }
 }
 </script>
@@ -247,6 +291,10 @@ export default {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.saved-icon {
+  color: #f56c6c;
 }
 
 .ticket-list {

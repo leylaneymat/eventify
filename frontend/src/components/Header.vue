@@ -1,11 +1,13 @@
 <template>
   <div class="header">
     <div class="header-left">
-      <h1 class="app-name">Eventify</h1>
+      <h1 class="app-name" @click="goToHome" style="cursor: pointer;">Eventify</h1>
     </div>
 
     <div class="header-right">
       <template v-if="userStore.isLoggedIn">
+        <el-button type="text" @click="goToSaved">Saved Events</el-button>
+        |
         <el-button type="text" @click="showPurchased">Purchased tickets</el-button>
         |
         <span>{{ userStore.user?.username }}</span>
@@ -16,7 +18,7 @@
         <el-button type="text" @click="openRegisterModal">Register</el-button>
       </template>
     </div>
-  
+
     <el-dialog v-model="purchasedTicketsDialogVisible" title="Purchased Tickets" width="700px">
       <div v-if="loading" class="loading-container">
         <el-icon class="is-loading">
@@ -82,10 +84,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { ElMessage } from 'element-plus'
 import axios from 'axios';
 
+const router = useRouter();
 const userStore = useUserStore()
 
 const loginDialogVisible = ref(false)
@@ -191,6 +195,18 @@ const showPurchased = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const goToHome = () => {
+  router.push('/');
+}
+
+const goToSaved = () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('Please login to view saved events');
+    return;
+  }
+  router.push('/saved');
 }
 </script>
 
