@@ -8,8 +8,7 @@
 
         <div class="header-actions">
           <el-button type="text" @click="toggleLike">
-            <el-icon v-if="event.isLiked"><StarFilled /></el-icon>
-            <el-icon v-else><Star /></el-icon>
+            <HeartIcon :filled="event.isLiked" />
             {{ event.likes || 0 }}
           </el-button>
 
@@ -102,7 +101,8 @@
 
 <script>
 import { ref } from 'vue';
-import { Star, StarFilled, ChatRound } from '@element-plus/icons-vue';
+import { ChatRound } from '@element-plus/icons-vue';
+import HeartIcon from "@/components/HeartIcon.vue";
 import { useUserStore } from '@/stores/userStore';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
@@ -221,8 +221,7 @@ export default {
     };
   },
   components: {
-    Star,
-    StarFilled,
+    HeartIcon,
     ChatRound
   }
 }
