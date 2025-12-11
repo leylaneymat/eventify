@@ -29,6 +29,20 @@
     <!-- CONTENT -->
     <div class="card-content">
       <p>{{ event.description }}</p>
+
+      <!-- Category Tags -->
+      <div v-if="event.categories && event.categories.length > 0" class="category-badges">
+        <el-tag
+          v-for="category in event.categories"
+          :key="category"
+          size="small"
+          type="info"
+          class="category-badge"
+        >
+          {{ formatCategory(category) }}
+        </el-tag>
+      </div>
+
       <p>
         {{ new Date(event.date).toLocaleString() }}
       </p>
@@ -129,6 +143,20 @@ export default {
     const selectedTicket = ref(null);
     const isSaved = ref(false);
 
+    const formatCategory = (category) => {
+      const categoryMap = {
+        'concert': 'Concert',
+        'conference': 'Conference',
+        'workshop': 'Workshop',
+        'sports': 'Sports',
+        'theater': 'Theater',
+        'exhibition': 'Exhibition',
+        'charity': 'Charity',
+        'other': 'Other'
+      };
+      return categoryMap[category] || category;
+    };
+
     // Check if event is saved on mount
     const checkSavedStatus = async () => {
       if (userStore.isLoggedIn) {
@@ -150,7 +178,7 @@ export default {
         if (isSaved.value) {
           const result = await userStore.unsaveEvent(props.event.id);
           if (result) {
-             emit('unsaved', props.event.id); // Add this line
+             emit('unsaved', props.event.id);
           }
           isSaved.value = false;
           ElMessage.success('Event removed from saved list');
@@ -263,7 +291,8 @@ export default {
       openTicketPurchaseDialog,
       buyTicket,
       isSaved,
-      toggleSave
+      toggleSave,
+      formatCategory
     };
   },
   components: {
@@ -299,6 +328,17 @@ export default {
 
 .saved-icon {
   color: #f56c6c;
+}
+
+.category-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.category-badge {
+  font-size: 12px;
 }
 
 .ticket-list {
