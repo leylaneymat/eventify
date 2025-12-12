@@ -138,8 +138,16 @@ export default {
       }
     };
 
+    const ensureLikeFlag = () => {
+      // normalize server snake_case flag into the camelCase field the UI expects
+      if (props.event && props.event.isLiked === undefined) {
+        props.event.isLiked = !!props.event.is_liked;
+      }
+    };
+
     onMounted(() => {
       checkSavedStatus();
+      ensureLikeFlag();
     });
 
     const toggleSave = async () => {

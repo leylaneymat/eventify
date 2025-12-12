@@ -96,6 +96,13 @@ const ensureOtherPresent = (arr) => {
   return arr
 }
 
+const normalizeEvent = (event) => ({
+  ...event,
+  isLiked: event?.isLiked ?? event?.is_liked ?? false,
+})
+
+const mapEventList = (rawEvents) => (rawEvents || []).map(normalizeEvent)
+
 const filterByCategory = async (category) => {
   selectedCategory.value = category
   loading.value = true
@@ -106,7 +113,8 @@ const filterByCategory = async (category) => {
       : '/api/v1/events/'
     const res = await api.get(url)
     // If the API returns an object (pagination) like { results: [...] }, handle both cases:
-    events.value = Array.isArray(res.data) ? res.data : (res.data.results ?? [])
+    const fetched = Array.isArray(res.data) ? res.data : (res.data.results ?? [])
+    events.value = mapEventList(fetched)
   } catch (err) {
     console.error("Error loading events:", err)
     events.value = []
