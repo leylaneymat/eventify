@@ -1,22 +1,24 @@
 <template>
   <div class="header">
     <div class="header-left">
-      <h1 class="app-name">Eventify</h1>
+      <h1 class="app-name" @click="goToHome" style="cursor: pointer;">Eventify</h1>
     </div>
 
     <div class="header-right">
       <template v-if="userStore.isLoggedIn">
+        <el-button type="text" @click="goToSaved">Saved Events</el-button>
+        |
         <el-button type="text" @click="showPurchased">Purchased tickets</el-button>
         |
         <span>{{ userStore.user?.username }}</span>
-        <el-button type="text" @click="userStore.logout">Logout</el-button>
+        <el-button type="text" @click="handleLogout">Logout</el-button>
       </template>
       <template v-else>
         <el-button type="text" @click="openLoginModal">Login</el-button>
         <el-button type="text" @click="openRegisterModal">Register</el-button>
       </template>
     </div>
-  
+
     <el-dialog v-model="purchasedTicketsDialogVisible" title="Purchased Tickets" width="700px">
       <div v-if="loading" class="loading-container">
         <el-icon class="is-loading">
@@ -82,10 +84,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { ElMessage } from 'element-plus'
 import axios from 'axios';
 
+const router = useRouter();
 const userStore = useUserStore()
 
 const loginDialogVisible = ref(false)
@@ -123,6 +127,7 @@ const submitLogin = async () => {
   if (success) {
     ElMessage.success('Login successful')
     loginDialogVisible.value = false
+	  router.go(0);
   } else {
     ElMessage.error('Login failed')
   }
@@ -146,6 +151,7 @@ const submitRegister = async () => {
   if (success) {
     ElMessage.success('Registration successful')
     registerDialogVisible.value = false
+    router.go(0);
   } else {
     ElMessage.error('Registration failed')
   }
@@ -191,6 +197,24 @@ const showPurchased = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handleLogout = () => {
+  userStore.logout();
+  ElMessage.success('Logged out successfully');
+  router.go(0);
+}
+
+const goToHome = () => {
+  router.push('/');
+}
+
+const goToSaved = () => {
+  if (!userStore.isLoggedIn) {
+    ElMessage.warning('Please login to view saved events');
+    return;
+  }
+  router.push('/saved');
 }
 </script>
 

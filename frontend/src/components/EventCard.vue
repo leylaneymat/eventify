@@ -16,12 +16,20 @@
             <el-icon><ChatRound /></el-icon>
             {{ event.comments.length || 0 }}
           </el-button>
+
+          <!-- SAVE BUTTON -->
+          <el-button type="text" @click="toggleSave" :title="isSaved ? 'Unsave event' : 'Save event'">
+            <el-icon v-if="isSaved" class="saved-icon"><CollectionTag /></el-icon>
+            <el-icon v-else><Collection /></el-icon>
+          </el-button>
         </div>
       </div>
     </template>
     <!-- CONTENT -->
     <div class="card-content">
       <p>{{ event.description }}</p>
+      <p>Category: {{ event.category }}</p>
+
       <p>
         {{ new Date(event.date).toLocaleString() }}
       </p>
@@ -100,8 +108,8 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { ChatRound } from '@element-plus/icons-vue';
+import { ref, onMounted } from 'vue';
+import { ChatRound, Collection, CollectionTag } from '@element-plus/icons-vue';
 import HeartIcon from "@/components/HeartIcon.vue";
 import { useUserStore } from '@/stores/userStore';
 import axios from 'axios';
@@ -114,12 +122,50 @@ export default {
       required: true
     }
   },
-  setup(props) {
+  emits: ['unsaved'],
+  setup(props, { emit }) {
     const showComments = ref(false);
     const newComment = ref('');
     const userStore = useUserStore();
     const showTicketPurchaseDialog = ref(false);
     const selectedTicket = ref(null);
+    const isSaved = ref(false);
+
+    // Check if event is saved on mount
+    const checkSavedStatus = async () => {
+      if (userStore.isLoggedIn) {
+        isSaved.value = await userStore.checkEventSaved(props.event.id);
+      }
+    };
+
+    onMounted(() => {
+      checkSavedStatus();
+    });
+
+    const toggleSave = async () => {
+      if (!userStore.isLoggedIn) {
+        ElMessage.warning('Please login to save events');
+        return;
+      }
+
+      try {
+        if (isSaved.value) {
+          const result = await userStore.unsaveEvent(props.event.id);
+          if (result) {
+             emit('unsaved', props.event.id);
+          }
+          isSaved.value = false;
+          ElMessage.success('Event removed from saved list');
+        } else {
+          await userStore.saveEvent(props.event.id);
+          isSaved.value = true;
+          ElMessage.success('Event saved successfully');
+        }
+      } catch (error) {
+        ElMessage.error('Failed to update saved status');
+        console.error(error);
+      }
+    };
 
     const toggleLike = async () => {
       if (!userStore.isLoggedIn) {
@@ -217,12 +263,16 @@ export default {
       showTicketPurchaseDialog,
       selectedTicket,
       openTicketPurchaseDialog,
-      buyTicket
+      buyTicket,
+      isSaved,
+      toggleSave
     };
   },
   components: {
-    HeartIcon,
-    ChatRound
+    ChatRound,
+    Collection,
+    CollectionTag,
+    HeartIcon
   }
 }
 </script>
@@ -246,6 +296,21 @@ export default {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.saved-icon {
+  color: #f56c6c;
+}
+
+.category-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.category-badge {
+  font-size: 12px;
 }
 
 .ticket-list {

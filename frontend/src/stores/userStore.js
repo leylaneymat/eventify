@@ -7,6 +7,8 @@ export const useUserStore = defineStore("user", {
 		isLoggedIn: false,
 		accessToken: null,
 		refreshToken: null,
+		savedEvents: [],
+		savedEventsLoaded: false,
 	}),
 	actions: {
 		async login(username, password) {
@@ -41,6 +43,9 @@ export const useUserStore = defineStore("user", {
 				localStorage.setItem("accessToken", this.accessToken);
 				localStorage.setItem("refreshToken", this.refreshToken);
 				localStorage.setItem("isLoggedIn", this.isLoggedIn);
+
+				// Load saved events after login
+				await this.loadSavedEvents();
 
 				return true;
 			} catch (error) {
@@ -89,6 +94,8 @@ export const useUserStore = defineStore("user", {
 			this.isLoggedIn = false;
 			this.accessToken = null;
 			this.refreshToken = null;
+			this.savedEvents = [];
+			this.savedEventsLoaded = false;
 
 			delete axios.defaults.headers.common["Authorization"];
 
@@ -107,6 +114,82 @@ export const useUserStore = defineStore("user", {
 			if (this.accessToken && this.refreshToken) {
 				axios.defaults.headers.common["Authorization"] =
 					`Bearer ${this.accessToken}`;
+
+				// Load saved events if user is logged in
+				if (this.isLoggedIn) {
+					this.loadSavedEvents();
+				}
+			}
+		},
+
+		// Saved Events Actions
+		async loadSavedEvents() {
+			if (!this.isLoggedIn) return;
+
+			try {
+				const response = await axios.get(
+					"http://localhost:8000/api/v1/events/saved/",
+				);
+				this.savedEvents = response.data;
+				this.savedEventsLoaded = true;
+			} catch (error) {
+				console.error("Failed to load saved events", error);
+				this.savedEvents = [];
+			}
+		},
+
+		async saveEvent(eventId) {
+			if (!this.isLoggedIn) {
+				throw new Error("User not logged in");
+			}
+
+			try {
+				const response = await axios.post(
+					"http://localhost:8000/api/v1/events/saved/save/",
+					{ event_id: eventId },
+				);
+
+				// Add to local state
+				this.savedEvents.push(response.data);
+				return true;
+			} catch (error) {
+				console.error("Failed to save event", error);
+				throw error;
+			}
+		},
+
+		async unsaveEvent(eventId) {
+			if (!this.isLoggedIn) {
+				throw new Error("User not logged in");
+			}
+
+			try {
+				await axios.delete(
+					`http://localhost:8000/api/v1/events/saved/${eventId}/`,
+				);
+
+				// Remove from local state
+				this.savedEvents = this.savedEvents.filter(
+					(saved) => saved.event.id !== eventId,
+				);
+				return true;
+			} catch (error) {
+				console.error("Failed to unsave event", error);
+				throw error;
+			}
+		},
+
+		async checkEventSaved(eventId) {
+			if (!this.isLoggedIn) return false;
+
+			try {
+				const response = await axios.get(
+					`http://localhost:8000/api/v1/events/saved/check/${eventId}/`,
+				);
+				return response.data.is_saved;
+			} catch (error) {
+				console.error("Failed to check saved status", error);
+				return false;
 			}
 		},
 	},
