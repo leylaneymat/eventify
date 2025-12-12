@@ -150,6 +150,11 @@ export default {
     const formattedDate = computed(() => formatDate(props.event.date));
     const formattedTime = computed(() => formatTime(props.event.date));
 
+    const toErrorText = (error, fallback) => {
+      const detail = error?.response?.data?.detail || error?.message || 'Unknown error';
+      return `${fallback}: ${detail}`;
+    };
+
     // Check if event is saved on mount
     const checkSavedStatus = async () => {
       if (userStore.isLoggedIn) {
@@ -189,7 +194,7 @@ export default {
           ElMessage.success('Event saved successfully');
         }
       } catch (error) {
-        ElMessage.error('Failed to update saved status');
+        ElMessage.error(toErrorText(error, 'Failed to update saved status'));
         console.error(error);
       }
     };
@@ -245,7 +250,7 @@ export default {
         props.event.comments.push(response.data);
         newComment.value = '';
       } catch (error) {
-        ElMessage.error('Failed to add comment');
+        ElMessage.error(toErrorText(error, 'Failed to add comment'));
         console.error(error);
       }
     };
@@ -276,7 +281,7 @@ export default {
         showTicketPurchaseDialog.value = false;
         selectedTicket.value = null;
       } catch (error) {
-        ElMessage.error('Failed to purchase ticket');
+        ElMessage.error(toErrorText(error, 'Failed to purchase ticket'));
         console.error(error);
       }
     };

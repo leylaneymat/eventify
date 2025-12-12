@@ -48,6 +48,11 @@ const userStore = useUserStore();
 const savedEvents = ref([]);
 const loading = ref(true);
 
+const toErrorText = (error, fallback) => {
+  const detail = error?.response?.data?.detail || error?.message || 'Unknown error';
+  return `${fallback}: ${detail}`;
+};
+
 const normalizeSavedEvent = (saved) => ({
   ...saved,
   event: {
@@ -68,7 +73,7 @@ const loadSavedEvents = async () => {
     await userStore.loadSavedEvents();
     savedEvents.value = userStore.savedEvents.map(normalizeSavedEvent);
   } catch (error) {
-    ElMessage.error('Failed to load saved events');
+    ElMessage.error(toErrorText(error, 'Failed to load saved events'));
     console.error(error);
   } finally {
     loading.value = false;
