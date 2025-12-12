@@ -122,6 +122,35 @@ export const useUserStore = defineStore("user", {
 			}
 		},
 
+		async tryRefreshOnStartup() {
+			const refreshToken = localStorage.getItem("refreshToken");
+		  
+			if (!refreshToken) {
+			  this.logout();
+			  return;
+			}
+		  
+			try {
+			  const response = await axios.post(
+				"http://localhost:8000/api/v1/token/refresh/",
+				{
+				  refresh: refreshToken,
+				}
+			  );
+		  
+			  this.accessToken = response.data.access;
+			  this.isLoggedIn = true;
+		  
+			  axios.defaults.headers.common["Authorization"] =
+				`Bearer ${this.accessToken}`;
+		  
+			  localStorage.setItem("accessToken", this.accessToken);
+			} catch (error) {
+			  this.logout();
+			}
+		  },
+		  
+
 		// Saved Events Actions
 		async loadSavedEvents() {
 			if (!this.isLoggedIn) return;

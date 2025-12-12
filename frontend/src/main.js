@@ -25,4 +25,6 @@ initializeAuth()
 const userStore = useUserStore()
 userStore.initializeStore()
 
+await userStore.tryRefreshOnStartup();
+
 app.mount('#app')
