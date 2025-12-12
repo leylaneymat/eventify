@@ -125,18 +125,7 @@ const loadCategories = async () => {
     categories.value = normalized
   } catch (err) {
     console.error("Error loading categories:", err)
-    // fallback: show a static list (including Other)
-    categories.value = [
-      { value: 'concert', label: 'Concert' },
-      { value: 'festival', label: 'Festival' },
-      { value: 'conference', label: 'Conference' },
-      { value: 'workshop', label: 'Workshop' },
-      { value: 'sports', label: 'Sports' },
-      { value: 'theater', label: 'Theater' },
-      { value: 'exhibition', label: 'Exhibition' },
-      { value: 'charity', label: 'Charity' },
-      { value: 'other', label: 'Other' }
-    ]
+    categories.value = []
   }
 }
 

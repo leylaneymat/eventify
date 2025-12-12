@@ -29,19 +29,7 @@
     <!-- CONTENT -->
     <div class="card-content">
       <p>{{ event.description }}</p>
-
-      <!-- Category Tags -->
-      <div v-if="event.categories && event.categories.length > 0" class="category-badges">
-        <el-tag
-          v-for="category in event.categories"
-          :key="category"
-          size="small"
-          type="info"
-          class="category-badge"
-        >
-          {{ formatCategory(category) }}
-        </el-tag>
-      </div>
+      <p>Category: {{ event.category }}</p>
 
       <p>
         {{ new Date(event.date).toLocaleString() }}
@@ -142,20 +130,6 @@ export default {
     const showTicketPurchaseDialog = ref(false);
     const selectedTicket = ref(null);
     const isSaved = ref(false);
-
-    const formatCategory = (category) => {
-      const categoryMap = {
-        'concert': 'Concert',
-        'conference': 'Conference',
-        'workshop': 'Workshop',
-        'sports': 'Sports',
-        'theater': 'Theater',
-        'exhibition': 'Exhibition',
-        'charity': 'Charity',
-        'other': 'Other'
-      };
-      return categoryMap[category] || category;
-    };
 
     // Check if event is saved on mount
     const checkSavedStatus = async () => {
@@ -291,8 +265,7 @@ export default {
       openTicketPurchaseDialog,
       buyTicket,
       isSaved,
-      toggleSave,
-      formatCategory
+      toggleSave
     };
   },
   components: {

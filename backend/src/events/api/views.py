@@ -1,9 +1,8 @@
 from django.db.utils import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status, viewsets
-from rest_framework.decorators import action
 from rest_framework.exceptions import NotFound, ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -115,6 +114,22 @@ class EventViewSet(viewsets.ModelViewSet):
         # allow comma-separated list: ?category=concert or ?category=concert,festival
         cats = [c.strip() for c in category.split(",") if c.strip()]
         return qs.filter(category__in=cats)
+
+
+class EventCategoriesAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        """
+        Return list like: [{ "value": "concert", "label": "Concert" }, ...]
+        """
+        categories = [
+            {"value": value, "label": label} for value, label in Event.CATEGORY_CHOICES
+        ]
+        # ensure "other" is present (usually it is if in choices)
+        if not any(c["value"].lower() == "other" for c in categories):
+            categories.append({"value": "other", "label": "Other"})
+        return Response(categories)
 
 
 class SaveEventView(APIView):
