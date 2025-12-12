@@ -27,12 +27,12 @@
     </template>
     <!-- CONTENT -->
     <div class="card-content">
-      <p>{{ event.description }}</p>
-      <p>Category: {{ event.category }}</p>
+      <p class="event-description">{{ event.description }}</p>
+      <p class="event-extra"></p>
+      <p class="event-date">Date: {{ formattedDate }}</p>
+      <p class="event-time">Time: {{ formattedTime }}</p>
+      <p class="event-category">Category: {{ event.category }}</p>
 
-      <p>
-        {{ new Date(event.date).toLocaleString() }}
-      </p>
       <div class="ticket-list">
         <h4>Tickets</h4>
         <el-table :data="event.tickets" style="width: 100%">
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { ChatRound, Collection, CollectionTag } from '@element-plus/icons-vue';
 import HeartIcon from "@/components/HeartIcon.vue";
 import { useUserStore } from '@/stores/userStore';
@@ -130,6 +130,25 @@ export default {
     const showTicketPurchaseDialog = ref(false);
     const selectedTicket = ref(null);
     const isSaved = ref(false);
+    const formatDate = (dateStr) => {
+      const dateObj = new Date(dateStr);
+      if (Number.isNaN(dateObj.getTime())) return '';
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const year = dateObj.getFullYear();
+      return `${day}.${month}.${year}`;
+    };
+
+    const formatTime = (dateStr) => {
+      const dateObj = new Date(dateStr);
+      if (Number.isNaN(dateObj.getTime())) return '';
+      const hours = String(dateObj.getHours()).padStart(2, '0');
+      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+
+    const formattedDate = computed(() => formatDate(props.event.date));
+    const formattedTime = computed(() => formatTime(props.event.date));
 
     // Check if event is saved on mount
     const checkSavedStatus = async () => {
@@ -273,7 +292,9 @@ export default {
       openTicketPurchaseDialog,
       buyTicket,
       isSaved,
-      toggleSave
+      toggleSave,
+      formattedDate,
+      formattedTime
     };
   },
   components: {
@@ -286,6 +307,12 @@ export default {
 </script>
 
 <style scoped>
+.event-card :deep(.el-card__body) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .event-card {
   width: 100%;
   max-width: 600px;
@@ -301,6 +328,33 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-content p {
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+
+.event-extra {
+  min-height: 8px;
+}
+
+.event-date,
+.event-time {
+  font-weight: 400;
+  color: #303133;
+}
+
+.event-category {
+  margin-top: 2px;
+  color: #303133;
 }
 
 .event-title {
@@ -344,6 +398,8 @@ export default {
   justify-content: flex-start;
   align-items: center;
   gap: 12px;
+  padding-top: 16px;
+  padding-bottom: 12px;
 }
 
 .comment-list {
