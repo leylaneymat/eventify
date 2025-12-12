@@ -4,7 +4,7 @@
     <!-- HEADER -->
     <template #header>
       <div class="card-header">
-        <h3>{{ event.name }}</h3>
+        <h3 class="event-title">{{ event.name }}</h3>
 
         <div class="header-actions">
           <el-button type="text" @click="toggleLike">
@@ -290,6 +290,9 @@ export default {
   width: 100%;
   max-width: 600px;
   margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   font-family: 'Inter', 'Helvetica Neue', Helvetica, 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
 }
@@ -298,6 +301,16 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.event-title {
+  flex: 1;
+  min-height: 48px; /* keep header height consistent for multi-line names */
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .header-actions {
@@ -326,9 +339,11 @@ export default {
 }
 
 .card-footer {
+  margin-top: auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 12px;
 }
 
 .comment-list {
