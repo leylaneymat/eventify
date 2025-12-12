@@ -42,7 +42,9 @@
     <!-- FOOTER -->
     <template #footer>
       <div class="card-footer">
-        <el-button type="primary" @click="openTicketPurchaseDialog" :disabled="!userStore.isLoggedIn">Buy Ticket</el-button>
+        <el-button type="primary" @click="openTicketPurchaseDialog">
+          Buy Ticket
+        </el-button>
       </div>
     </template>
 
@@ -50,9 +52,13 @@
     <el-dialog v-model="showComments" title="Event Comments">
       <div class="comment-list">
         <div class="comment-header">
-          <el-input class="comment-box" v-model="newComment" placeholder="Add a comment"
-            :disabled="!userStore.isLoggedIn" />
-          <el-button type="primary" @click="addComment" :disabled="!userStore.isLoggedIn">
+          <el-input
+            class="comment-box"
+            v-model="newComment"
+            placeholder="Add a comment"
+          />
+
+          <el-button type="primary" @click="addComment">
             Add Comment
           </el-button>
         </div>
@@ -167,7 +173,7 @@ export default {
 
     const toggleLike = async () => {
       if (!userStore.isLoggedIn) {
-        ElMessage.warning('Please login');
+        ElMessage.warning('Please login to like events');
         return;
       }
 
@@ -200,7 +206,7 @@ export default {
 
     const addComment = async () => {
       if (!userStore.isLoggedIn) {
-        ElMessage.warning('Please login');
+        ElMessage.warning('Please login to add comments');
         return;
       }
 
@@ -222,6 +228,11 @@ export default {
     };
 
     const openTicketPurchaseDialog = () => {
+      if (!userStore.isLoggedIn) {
+        ElMessage.warning('Please login to purchase tickets');
+        return;
+      }
+
       showTicketPurchaseDialog.value = true;
       selectedTicket.value = null;
     };
