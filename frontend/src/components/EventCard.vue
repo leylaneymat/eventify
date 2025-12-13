@@ -37,7 +37,11 @@
         <h4>Tickets</h4>
         <el-table :data="event.tickets" style="width: 100%">
           <el-table-column prop="name" label="Name" />
-          <el-table-column prop="price" label="Price" />
+          <el-table-column label="Price">
+            <template #default="scope">
+              ₼{{ scope.row.price }}
+            </template>
+          </el-table-column>
         </el-table>
       </div>
     </div>
@@ -80,12 +84,12 @@
               <el-option
                 v-for="ticket in event.tickets"
                 :key="ticket.id"
-                :label="`${ticket.name} - $${ticket.price}`"
+                :label="`${ticket.name} - ₼${ticket.price}`"
                 :value="ticket.id"
               >
                 <div class="ticket-option">
                   <span>{{ ticket.name }}</span>
-                  <span class="ticket-price">${{ ticket.price }}</span>
+                  <span class="ticket-price">₼{{ ticket.price }}</span>
                 </div>
               </el-option>
             </el-select>

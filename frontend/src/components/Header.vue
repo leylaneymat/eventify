@@ -34,7 +34,7 @@
         <el-table-column label="Ticket Name" prop="ticket.name" width="150" />
         <el-table-column label="Price" width="100">
           <template #default="scope">
-            ${{ scope.row.ticket.price }}
+            ₼{{ scope.row.ticket.price }}
           </template>
         </el-table-column>
         <el-table-column label="Purchase Date" pro width="200">
