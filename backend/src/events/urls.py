@@ -3,6 +3,7 @@ from django.urls import path
 from events.api.views import (
     CheckEventSavedView,
     CommentViewSet,
+    EventCategoriesAPIView,
     EventViewSet,
     LikeViewSet,
     SavedEventsListView,
@@ -108,4 +109,5 @@ urlpatterns = [
         CheckEventSavedView.as_view(),
         name="check-event-saved",
     ),
+    path("categories/", EventCategoriesAPIView.as_view(), name="event-categories"),
 ]

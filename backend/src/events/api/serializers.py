@@ -31,6 +31,7 @@ class EventSerializer(serializers.ModelSerializer):
     tickets = TicketSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     likes = serializers.SerializerMethodField()
+    category = serializers.CharField(source="get_category_display", read_only=True)
 
     class Meta:
         model = Event
@@ -42,6 +43,7 @@ class EventSerializer(serializers.ModelSerializer):
             "tickets",
             "comments",
             "likes",
+            "category",  # <-- added here
         )
 
     def get_likes(self, obj):
@@ -49,6 +51,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tickets_data = validated_data.pop("tickets", None)
+        # If category is included in validated_data it will be present here
         event = Event.objects.create(**validated_data)
 
         if tickets_data:

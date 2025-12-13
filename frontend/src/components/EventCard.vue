@@ -8,8 +8,7 @@
 
         <div class="header-actions">
           <el-button type="text" @click="toggleLike">
-            <el-icon v-if="event.isLiked"><StarFilled /></el-icon>
-            <el-icon v-else><Star /></el-icon>
+            <HeartIcon :filled="event.isLiked" />
             {{ event.likes || 0 }}
           </el-button>
 
@@ -29,6 +28,8 @@
     <!-- CONTENT -->
     <div class="card-content">
       <p>{{ event.description }}</p>
+      <p>Category: {{ event.category }}</p>
+
       <p>
         {{ new Date(event.date).toLocaleString() }}
       </p>
@@ -114,7 +115,8 @@
 
 <script>
 import { ref, onMounted } from 'vue';
-import { Star, StarFilled, ChatRound, Collection, CollectionTag } from '@element-plus/icons-vue';
+import { ChatRound, Collection, CollectionTag } from '@element-plus/icons-vue';
+import HeartIcon from "@/components/HeartIcon.vue";
 import { useUserStore } from '@/stores/userStore';
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
@@ -156,7 +158,7 @@ export default {
         if (isSaved.value) {
           const result = await userStore.unsaveEvent(props.event.id);
           if (result) {
-             emit('unsaved', props.event.id); // Add this line
+             emit('unsaved', props.event.id);
           }
           isSaved.value = false;
           ElMessage.success('Event removed from saved list');
@@ -278,11 +280,10 @@ export default {
     };
   },
   components: {
-    Star,
-    StarFilled,
     ChatRound,
     Collection,
-    CollectionTag
+    CollectionTag,
+    HeartIcon
   }
 }
 </script>
@@ -310,6 +311,17 @@ export default {
 
 .saved-icon {
   color: #f56c6c;
+}
+
+.category-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.category-badge {
+  font-size: 12px;
 }
 
 .ticket-list {
