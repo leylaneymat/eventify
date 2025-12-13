@@ -206,11 +206,11 @@ const showPurchased = async () => {
   loading.value = true
 
   try {
-    const purchased_tickets = (await axios.get(`http://localhost:8000/api/v1/users/${userStore.user.id}/purchased_tickets/`)).data
+    const purchased_tickets = (await axios.get(`/api/v1/users/${userStore.user.id}/purchased_tickets/`)).data
 
     for (let i = 0; i < purchased_tickets.length; i++) {
-      const selected_event = (await axios.get(`http://localhost:8000/api/v1/events/${purchased_tickets[i].event}/`)).data
-      const selected_ticket = (await axios.get(`http://localhost:8000/api/v1/events/${purchased_tickets[i].event}/tickets/${purchased_tickets[i].ticket}/`)).data
+      const selected_event = (await axios.get(`/api/v1/events/${purchased_tickets[i].event}/`)).data
+      const selected_ticket = (await axios.get(`/api/v1/events/${purchased_tickets[i].event}/tickets/${purchased_tickets[i].ticket}/`)).data
       purchasedTickets.value.push({
         'id': purchased_tickets[i].id,
         'purchaseDate': purchased_tickets[i].purchase_date,
@@ -239,7 +239,7 @@ const sendReceipt = async (purchasedTicket) => {
 
   try {
     await axios.post(
-      `http://localhost:8000/api/v1/users/purchased_tickets/${purchasedTicket.id}/send_receipt/`
+      `/api/v1/users/purchased_tickets/${purchasedTicket.id}/send_receipt/`
     )
     ElMessage.success('Receipt sent to your email!')
   } catch (error) {

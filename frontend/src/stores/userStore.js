@@ -14,13 +14,10 @@ export const useUserStore = defineStore("user", {
 	actions: {
 		async login(username, password) {
 			try {
-				const response = await axios.post(
-					"http://localhost:8000/api/v1/token/",
-					{
-						username,
-						password,
-					},
-				);
+				const response = await axios.post("/api/v1/token/", {
+					username,
+					password,
+				});
 
 				this.accessToken = response.data.access;
 				this.refreshToken = response.data.refresh;
@@ -28,11 +25,8 @@ export const useUserStore = defineStore("user", {
 				axios.defaults.headers.common["Authorization"] =
 					`Bearer ${this.accessToken}`;
 
-				const userData = (
-					await axios.get(
-						`http://localhost:8000/api/v1/users/${username}/`,
-					)
-				).data;
+				const userData = (await axios.get(`/api/v1/users/${username}/`))
+					.data;
 
 				this.user = {
 					id: userData.id,
@@ -59,7 +53,7 @@ export const useUserStore = defineStore("user", {
 
 		async register(username, email, password) {
 			try {
-				await axios.post("http://localhost:8000/api/v1/users/", {
+				await axios.post("/api/v1/users/", {
 					username,
 					email,
 					password,
@@ -77,12 +71,9 @@ export const useUserStore = defineStore("user", {
 
 		async refresh() {
 			try {
-				const response = await axios.post(
-					"http://localhost:8000/api/v1/token/refresh/",
-					{
-						refresh: this.refreshToken,
-					},
-				);
+				const response = await axios.post("/api/v1/token/refresh/", {
+					refresh: this.refreshToken,
+				});
 
 				this.accessToken = response.data.access;
 
@@ -132,41 +123,35 @@ export const useUserStore = defineStore("user", {
 
 		async tryRefreshOnStartup() {
 			const refreshToken = localStorage.getItem("refreshToken");
-		  
+
 			if (!refreshToken) {
-			  this.logout();
-			  return;
+				this.logout();
+				return;
 			}
-		  
+
 			try {
-			  const response = await axios.post(
-				"http://localhost:8000/api/v1/token/refresh/",
-				{
-				  refresh: refreshToken,
-				}
-			  );
-		  
-			  this.accessToken = response.data.access;
-			  this.isLoggedIn = true;
-		  
-			  axios.defaults.headers.common["Authorization"] =
-				`Bearer ${this.accessToken}`;
-		  
-			  localStorage.setItem("accessToken", this.accessToken);
+				const response = await axios.post("/api/v1/token/refresh/", {
+					refresh: refreshToken,
+				});
+
+				this.accessToken = response.data.access;
+				this.isLoggedIn = true;
+
+				axios.defaults.headers.common["Authorization"] =
+					`Bearer ${this.accessToken}`;
+
+				localStorage.setItem("accessToken", this.accessToken);
 			} catch (error) {
-			  this.logout();
+				this.logout();
 			}
-		  },
-		  
+		},
 
 		// Saved Events Actions
 		async loadSavedEvents() {
 			if (!this.isLoggedIn) return;
 
 			try {
-				const response = await axios.get(
-					"http://localhost:8000/api/v1/events/saved/",
-				);
+				const response = await axios.get("/api/v1/events/saved/");
 				this.savedEvents = response.data;
 				this.savedEventsLoaded = true;
 			} catch (error) {
@@ -182,7 +167,7 @@ export const useUserStore = defineStore("user", {
 
 			try {
 				const response = await axios.post(
-					"http://localhost:8000/api/v1/events/saved/save/",
+					"/api/v1/events/saved/save/",
 					{ event_id: eventId },
 				);
 
@@ -201,9 +186,7 @@ export const useUserStore = defineStore("user", {
 			}
 
 			try {
-				await axios.delete(
-					`http://localhost:8000/api/v1/events/saved/${eventId}/`,
-				);
+				await axios.delete(`/api/v1/events/saved/${eventId}/`);
 
 				// Remove from local state
 				this.savedEvents = this.savedEvents.filter(
@@ -221,7 +204,7 @@ export const useUserStore = defineStore("user", {
 
 			try {
 				const response = await axios.get(
-					`http://localhost:8000/api/v1/events/saved/check/${eventId}/`,
+					`/api/v1/events/saved/check/${eventId}/`,
 				);
 				return response.data.is_saved;
 			} catch (error) {
