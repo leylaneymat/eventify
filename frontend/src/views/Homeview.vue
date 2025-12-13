@@ -158,6 +158,8 @@ onMounted(async () => {
   font-size: 20px;
   margin-bottom: 16px;
   color: #303133;
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
 }
 
 .category-filters {

@@ -333,6 +333,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .card-content {
@@ -370,6 +371,8 @@ export default {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
 .header-actions {
