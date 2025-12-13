@@ -4,7 +4,7 @@
     <!-- HEADER -->
     <template #header>
       <div class="card-header">
-        <h3>{{ event.name }}</h3>
+        <h3 class="event-title">{{ event.name }}</h3>
 
         <div class="header-actions">
           <el-button type="text" @click="toggleLike">
@@ -27,17 +27,21 @@
     </template>
     <!-- CONTENT -->
     <div class="card-content">
-      <p>{{ event.description }}</p>
-      <p>Category: {{ event.category }}</p>
+      <p class="event-description">{{ event.description }}</p>
+      <p class="event-extra"></p>
+      <p class="event-date">Date: {{ formattedDate }}</p>
+      <p class="event-time">Time: {{ formattedTime }}</p>
+      <p class="event-category">Category: {{ event.category }}</p>
 
-      <p>
-        {{ new Date(event.date).toLocaleString() }}
-      </p>
       <div class="ticket-list">
         <h4>Tickets</h4>
         <el-table :data="event.tickets" style="width: 100%">
           <el-table-column prop="name" label="Name" />
-          <el-table-column prop="price" label="Price" />
+          <el-table-column label="Price">
+            <template #default="scope">
+              ₼{{ scope.row.price }}
+            </template>
+          </el-table-column>
         </el-table>
       </div>
     </div>
@@ -86,12 +90,12 @@
               <el-option
                 v-for="ticket in event.tickets"
                 :key="ticket.id"
-                :label="`${ticket.name} - $${ticket.price}`"
+                :label="`${ticket.name} - ₼${ticket.price}`"
                 :value="ticket.id"
               >
                 <div class="ticket-option">
                   <span>{{ ticket.name }}</span>
-                  <span class="ticket-price">${{ ticket.price }}</span>
+                  <span class="ticket-price">₼{{ ticket.price }}</span>
                 </div>
               </el-option>
             </el-select>
@@ -114,7 +118,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { ChatRound, Collection, CollectionTag } from '@element-plus/icons-vue';
 import HeartIcon from "@/components/HeartIcon.vue";
 import { useUserStore } from '@/stores/userStore';
@@ -136,6 +140,30 @@ export default {
     const showTicketPurchaseDialog = ref(false);
     const selectedTicket = ref(null);
     const isSaved = ref(false);
+    const formatDate = (dateStr) => {
+      const dateObj = new Date(dateStr);
+      if (Number.isNaN(dateObj.getTime())) return '';
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const year = dateObj.getFullYear();
+      return `${day}.${month}.${year}`;
+    };
+
+    const formatTime = (dateStr) => {
+      const dateObj = new Date(dateStr);
+      if (Number.isNaN(dateObj.getTime())) return '';
+      const hours = String(dateObj.getHours()).padStart(2, '0');
+      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+
+    const formattedDate = computed(() => formatDate(props.event.date));
+    const formattedTime = computed(() => formatTime(props.event.date));
+
+    const toErrorText = (error, fallback) => {
+      const detail = error?.response?.data?.detail || error?.message || 'Unknown error';
+      return `${fallback}: ${detail}`;
+    };
 
     // Check if event is saved on mount
     const checkSavedStatus = async () => {
@@ -144,8 +172,16 @@ export default {
       }
     };
 
+    const ensureLikeFlag = () => {
+      // normalize server snake_case flag into the camelCase field the UI expects
+      if (props.event && props.event.isLiked === undefined) {
+        props.event.isLiked = !!props.event.is_liked;
+      }
+    };
+
     onMounted(() => {
       checkSavedStatus();
+      ensureLikeFlag();
     });
 
     const toggleSave = async () => {
@@ -168,7 +204,7 @@ export default {
           ElMessage.success('Event saved successfully');
         }
       } catch (error) {
-        ElMessage.error('Failed to update saved status');
+        ElMessage.error(toErrorText(error, 'Failed to update saved status'));
         console.error(error);
       }
     };
@@ -224,7 +260,7 @@ export default {
         props.event.comments.push(response.data);
         newComment.value = '';
       } catch (error) {
-        ElMessage.error('Failed to add comment');
+        ElMessage.error(toErrorText(error, 'Failed to add comment'));
         console.error(error);
       }
     };
@@ -260,7 +296,7 @@ export default {
         showTicketPurchaseDialog.value = false;
         selectedTicket.value = null;
       } catch (error) {
-        ElMessage.error('Failed to purchase ticket');
+        ElMessage.error(toErrorText(error, 'Failed to purchase ticket'));
         console.error(error);
       }
     };
@@ -276,7 +312,9 @@ export default {
       openTicketPurchaseDialog,
       buyTicket,
       isSaved,
-      toggleSave
+      toggleSave,
+      formattedDate,
+      formattedTime
     };
   },
   components: {
@@ -289,10 +327,19 @@ export default {
 </script>
 
 <style scoped>
+.event-card :deep(.el-card__body) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .event-card {
   width: 100%;
   max-width: 600px;
   margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   font-family: 'Inter', 'Helvetica Neue', Helvetica, 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
 }
@@ -300,6 +347,46 @@ export default {
 .card-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-content p {
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+
+.event-extra {
+  min-height: 8px;
+}
+
+.event-date,
+.event-time {
+  font-weight: 400;
+  color: #303133;
+}
+
+.event-category {
+  margin-top: 2px;
+  color: #303133;
+}
+
+.event-title {
+  flex: 1;
+  min-height: 48px; /* keep header height consistent for multi-line names */
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  display: flex;
   align-items: center;
 }
 
@@ -329,9 +416,13 @@ export default {
 }
 
 .card-footer {
+  margin-top: auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  padding-bottom: 12px;
 }
 
 .comment-list {

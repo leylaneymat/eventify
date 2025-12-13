@@ -9,6 +9,7 @@ export const useUserStore = defineStore("user", {
 		refreshToken: null,
 		savedEvents: [],
 		savedEventsLoaded: false,
+		lastError: null,
 	}),
 	actions: {
 		async login(username, password) {
@@ -46,24 +47,30 @@ export const useUserStore = defineStore("user", {
 
 				// Load saved events after login
 				await this.loadSavedEvents();
+				this.lastError = null;
 
 				return true;
 			} catch (error) {
 				console.error("Login failed", error);
+				this.lastError = error;
 				return false;
 			}
 		},
 
-		async register(username, password) {
+		async register(username, email, password) {
 			try {
 				await axios.post("http://localhost:8000/api/v1/users/", {
 					username,
+					email,
 					password,
 				});
 
-				return await this.login(username, password);
+				const success = await this.login(username, password);
+				this.lastError = success ? null : this.lastError;
+				return success;
 			} catch (error) {
 				console.error("Registration failed", error);
+				this.lastError = error;
 				return false;
 			}
 		},
@@ -96,6 +103,7 @@ export const useUserStore = defineStore("user", {
 			this.refreshToken = null;
 			this.savedEvents = [];
 			this.savedEventsLoaded = false;
+			this.lastError = null;
 
 			delete axios.defaults.headers.common["Authorization"];
 

@@ -11,7 +11,7 @@ export default api;
 export const setupAxiosInterceptors = () => {
   api.interceptors.request.use(
     config => {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("accessToken")
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
       }
@@ -23,7 +23,7 @@ export const setupAxiosInterceptors = () => {
 
 // Initialize axios defaults on app startup.
 export const initializeAuth = () => {
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("accessToken")
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`
   }

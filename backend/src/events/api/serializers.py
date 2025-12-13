@@ -31,6 +31,7 @@ class EventSerializer(serializers.ModelSerializer):
     tickets = TicketSerializer(many=True, read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     likes = serializers.SerializerMethodField()
+    is_liked = serializers.SerializerMethodField()
     category = serializers.CharField(source="get_category_display", read_only=True)
 
     class Meta:
@@ -43,11 +44,22 @@ class EventSerializer(serializers.ModelSerializer):
             "tickets",
             "comments",
             "likes",
+            "is_liked",
             "category",  # <-- added here
         )
 
     def get_likes(self, obj):
         return obj.likes.count()
+
+    def get_is_liked(self, obj):
+        """Return whether the authenticated user liked this event."""
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
+        if user and getattr(user, "is_authenticated", False):
+            return obj.likes.filter(user=user).exists()
+
+        return False
 
     def create(self, validated_data):
         tickets_data = validated_data.pop("tickets", None)
@@ -87,7 +99,7 @@ class SavedEventSerializer(serializers.ModelSerializer):
         # Import your existing EventSerializer here
         from events.api.serializers import EventSerializer
 
-        return EventSerializer(obj.event).data
+        return EventSerializer(obj.event, context=self.context).data
 
     def create(self, validated_data):
         user = self.context["request"].user
@@ -119,4 +131,4 @@ class SavedEventListSerializer(serializers.ModelSerializer):
         # Import your existing EventSerializer here
         from events.api.serializers import EventSerializer
 
-        return EventSerializer(obj.event).data
+        return EventSerializer(obj.event, context=self.context).data

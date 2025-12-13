@@ -48,6 +48,19 @@ const userStore = useUserStore();
 const savedEvents = ref([]);
 const loading = ref(true);
 
+const toErrorText = (error, fallback) => {
+  const detail = error?.response?.data?.detail || error?.message || 'Unknown error';
+  return `${fallback}: ${detail}`;
+};
+
+const normalizeSavedEvent = (saved) => ({
+  ...saved,
+  event: {
+    ...saved.event,
+    isLiked: saved.event?.isLiked ?? saved.event?.is_liked ?? false,
+  },
+});
+
 const loadSavedEvents = async () => {
   if (!userStore.isLoggedIn) {
     ElMessage.warning('Please login to view saved events');
@@ -58,9 +71,9 @@ const loadSavedEvents = async () => {
   loading.value = true;
   try {
     await userStore.loadSavedEvents();
-    savedEvents.value = userStore.savedEvents;
+    savedEvents.value = userStore.savedEvents.map(normalizeSavedEvent);
   } catch (error) {
-    ElMessage.error('Failed to load saved events');
+    ElMessage.error(toErrorText(error, 'Failed to load saved events'));
     console.error(error);
   } finally {
     loading.value = false;

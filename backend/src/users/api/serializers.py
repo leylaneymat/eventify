@@ -17,15 +17,16 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "password",
         )
+        extra_kwargs = {
+            "password": {"write_only": True},
+            "email": {"required": True},
+        }
 
     def create(self, validated_data):
-        password = validated_data.pop("password", None)
-
-        if not password:
-            ValidationError("This field is required and cannot be empty.")
-
-        user = self.Meta.model._default_manager.create_user(
-            **validated_data, password=password
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
         )
         return user
 
