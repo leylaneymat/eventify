@@ -19,7 +19,7 @@
       </template>
     </div>
 
-    <el-dialog v-model="purchasedTicketsDialogVisible" title="Purchased Tickets" width="700px">
+    <el-dialog v-model="purchasedTicketsDialogVisible" title="Purchased Tickets" width="800px">
       <div v-if="loading" class="loading-container">
         <el-icon class="is-loading">
           <Loading />
@@ -30,16 +30,29 @@
         <p>You haven't purchased any tickets yet.</p>
       </div>
       <el-table v-else :data="purchasedTickets" style="width: 100%">
-        <el-table-column label="Event Name" prop="event.name" width="200" />
-        <el-table-column label="Ticket Name" prop="ticket.name" width="150" />
+        <el-table-column label="Event Name" prop="event.name" width="180" />
+        <el-table-column label="Ticket Name" prop="ticket.name" width="140" />
         <el-table-column label="Price" width="100">
           <template #default="scope">
             ${{ scope.row.ticket.price }}
           </template>
         </el-table-column>
-        <el-table-column label="Purchase Date" pro width="200">
+        <el-table-column label="Purchase Date" width="180">
           <template #default="scope">
             {{ scope.row.purchaseDate }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Actions" width="150">
+          <template #default="scope">
+            <el-button
+              type="primary"
+              size="small"
+              @click="sendReceipt(scope.row)"
+              :loading="scope.row.sendingEmail"
+              icon="Message"
+            >
+              Send Receipt
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -188,7 +201,8 @@ const showPurchased = async () => {
           'id': selected_ticket.id,
           'name': selected_ticket.name,
           'price': selected_ticket.price
-        }
+        },
+        'sendingEmail': false
       })
     }
   } catch (error) {
@@ -196,6 +210,26 @@ const showPurchased = async () => {
     console.error(error)
   } finally {
     loading.value = false
+  }
+}
+
+const sendReceipt = async (purchasedTicket) => {
+  purchasedTicket.sendingEmail = true
+
+  try {
+    await axios.post(
+      `http://localhost:8000/api/v1/users/purchased_tickets/${purchasedTicket.id}/send_receipt/`
+    )
+    ElMessage.success('Receipt sent to your email!')
+  } catch (error) {
+    if (error.response?.data?.error) {
+      ElMessage.error(error.response.data.error)
+    } else {
+      ElMessage.error('Failed to send receipt')
+    }
+    console.error(error)
+  } finally {
+    purchasedTicket.sendingEmail = false
   }
 }
 
@@ -253,5 +287,18 @@ const goToSaved = () => {
 
 .cancel-button {
   color: black;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+
+.no-tickets {
+  text-align: center;
+  padding: 40px;
+  color: #909399;
 }
 </style>
