@@ -44,7 +44,13 @@ docker exec -it eventfy-backend python manage.py createsuperuser
 
 ## Access
 
-Once the application is running, you can access it via your web browser:
+Once the application is running, you can access it in your web browser:
 
-  * Access the main Eventify website at `localhost:8080`
-  * Access the administrative backend at `localhost:8000/admin`
+- **Eventify Web App:** http://localhost:8080  
+- **Admin Panel:** http://localhost:8000/admin  
+
+---
+
+Admin Credentials are as follows:
+- **Username:** admin  
+- **Password:** 123
