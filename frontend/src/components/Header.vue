@@ -1,7 +1,8 @@
 <template>
   <div class="header">
-    <div class="header-left">
-      <h1 class="app-name" @click="goToHome" style="cursor: pointer;">Eventify</h1>
+    <div class="header-left" @click="goToHome" style="cursor: pointer;">
+      <img src="/ticket.png" alt="Eventify logo" class="logo" />
+      <h1 class="app-name">Eventify</h1>
     </div>
 
     <div class="header-right">
@@ -307,6 +308,12 @@ const goToSaved = () => {
 
 .cancel-button {
   color: black;
+}
+
+.logo {
+  width: 28px;
+  height: 28px;
+  margin-right: 8px;
 }
 
 .loading-container {
