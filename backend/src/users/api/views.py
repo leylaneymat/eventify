@@ -1,7 +1,13 @@
+import logging
+
+from django.conf import settings
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from rest_framework import status, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from users.api.serializers import PurchasedTicketSerializer, UserSerializer
@@ -56,3 +62,68 @@ def get_user_by_username(request, username):
         return Response(status=status.HTTP_403_FORBIDDEN)
 
     return Response(UserSerializer(user).data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def send_ticket_receipt(request, purchased_ticket_id):
+    """Send receipt email for a purchased ticket"""
+    try:
+        purchased_ticket = PurchasedTicket.objects.select_related(
+            "user", "event", "ticket"
+        ).get(id=purchased_ticket_id, user=request.user)
+
+        user_email = request.user.email
+        if not user_email:
+            return Response(
+                {"error": "No email address found for user"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        context = {
+            "user": request.user,
+            "event": purchased_ticket.event,
+            "ticket": purchased_ticket.ticket,
+            "purchase_date": purchased_ticket.purchase_date,
+            "purchased_ticket_id": purchased_ticket.id,
+        }
+
+        subject = f"Ticket Receipt - {purchased_ticket.event.name}"
+        html_message = render_to_string("emails/ticket_receipt.html", context)
+        plain_message = render_to_string("emails/ticket_receipt.txt", context)
+
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user_email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+
+        return Response(
+            {"message": f"Receipt sent to {user_email}"},
+            status=status.HTTP_200_OK,
+        )
+
+    except PurchasedTicket.DoesNotExist:
+        return Response(
+            {"error": "Purchased ticket not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    except Exception:
+        # 👇 Logs full traceback to console
+        logger = logging.getLogger(__name__)
+        logger.exception(
+            "Failed to send ticket receipt",
+            extra={
+                "user_id": request.user.id,
+                "purchased_ticket_id": purchased_ticket_id,
+            },
+        )
+
+        return Response(
+            {"error": "Internal server error"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

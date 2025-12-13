@@ -1,6 +1,11 @@
 from django.urls import path
 
-from users.api.views import PurchasedTicketViewSet, UserViewSet, get_user_by_username
+from users.api.views import (
+    PurchasedTicketViewSet,
+    UserViewSet,
+    get_user_by_username,
+    send_ticket_receipt,
+)
 
 urlpatterns = [
     # users
@@ -38,5 +43,10 @@ urlpatterns = [
             {"get": "retrieve"},
             suffix="Instance",
         ),
+    ),
+    path(
+        "purchased_tickets/<int:purchased_ticket_id>/send_receipt/",
+        send_ticket_receipt,
+        name="send-ticket-receipt",
     ),
 ]

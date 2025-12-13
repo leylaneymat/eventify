@@ -19,7 +19,7 @@
       </template>
     </div>
 
-    <el-dialog v-model="purchasedTicketsDialogVisible" title="Purchased Tickets" width="700px">
+    <el-dialog v-model="purchasedTicketsDialogVisible" title="Purchased Tickets" width="800px">
       <div v-if="loading" class="loading-container">
         <el-icon class="is-loading">
           <Loading />
@@ -30,16 +30,29 @@
         <p>You haven't purchased any tickets yet.</p>
       </div>
       <el-table v-else :data="purchasedTickets" style="width: 100%">
-        <el-table-column label="Event Name" prop="event.name" width="200" />
-        <el-table-column label="Ticket Name" prop="ticket.name" width="150" />
+        <el-table-column label="Event Name" prop="event.name" width="180" />
+        <el-table-column label="Ticket Name" prop="ticket.name" width="140" />
         <el-table-column label="Price" width="100">
           <template #default="scope">
             ${{ scope.row.ticket.price }}
           </template>
         </el-table-column>
-        <el-table-column label="Purchase Date" pro width="200">
+        <el-table-column label="Purchase Date" width="180">
           <template #default="scope">
             {{ scope.row.purchaseDate }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Actions" width="150">
+          <template #default="scope">
+            <el-button
+              type="primary"
+              size="small"
+              @click="sendReceipt(scope.row)"
+              :loading="scope.row.sendingEmail"
+              icon="Message"
+            >
+              Send Receipt
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -64,6 +77,9 @@
       <el-form :model="registerForm" label-width="120px">
         <el-form-item label="Username">
           <el-input v-model="registerForm.username" placeholder="Choose a username" />
+        </el-form-item>
+        <el-form-item label="Email">
+          <el-input v-model="registerForm.email" type="email" placeholder="Enter your email" />
         </el-form-item>
         <el-form-item label="Password">
           <el-input v-model="registerForm.password" type="password" placeholder="Create a password" show-password />
@@ -102,6 +118,7 @@ const loginForm = ref({
 
 const registerForm = ref({
   username: '',
+  email: '',
   password: '',
   confirmPassword: ''
 })
@@ -134,10 +151,17 @@ const submitLogin = async () => {
 }
 
 const submitRegister = async () => {
-  const { username, password, confirmPassword } = registerForm.value
+  const { username, email, password, confirmPassword } = registerForm.value
 
-  if (!username || !password) {
-    ElMessage.error('Please enter username and password')
+  if (!username || !email || !password) {
+    ElMessage.error('Please fill in all fields')
+    return
+  }
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) {
+    ElMessage.error('Please enter a valid email address')
     return
   }
 
@@ -146,7 +170,7 @@ const submitRegister = async () => {
     return
   }
 
-  const success = await userStore.register(username, password)
+  const success = await userStore.register(username, email, password)
 
   if (success) {
     ElMessage.success('Registration successful')
@@ -188,7 +212,8 @@ const showPurchased = async () => {
           'id': selected_ticket.id,
           'name': selected_ticket.name,
           'price': selected_ticket.price
-        }
+        },
+        'sendingEmail': false
       })
     }
   } catch (error) {
@@ -196,6 +221,26 @@ const showPurchased = async () => {
     console.error(error)
   } finally {
     loading.value = false
+  }
+}
+
+const sendReceipt = async (purchasedTicket) => {
+  purchasedTicket.sendingEmail = true
+
+  try {
+    await axios.post(
+      `http://localhost:8000/api/v1/users/purchased_tickets/${purchasedTicket.id}/send_receipt/`
+    )
+    ElMessage.success('Receipt sent to your email!')
+  } catch (error) {
+    if (error.response?.data?.error) {
+      ElMessage.error(error.response.data.error)
+    } else {
+      ElMessage.error('Failed to send receipt')
+    }
+    console.error(error)
+  } finally {
+    purchasedTicket.sendingEmail = false
   }
 }
 
@@ -253,5 +298,18 @@ const goToSaved = () => {
 
 .cancel-button {
   color: black;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+
+.no-tickets {
+  text-align: center;
+  padding: 40px;
+  color: #909399;
 }
 </style>

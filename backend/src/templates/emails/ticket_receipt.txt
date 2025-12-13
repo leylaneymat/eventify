@@ -1,0 +1,22 @@
+TICKET RECEIPT
+==============
+
+Hello {{ user.username }},
+
+Your ticket purchase has been confirmed. Here are your ticket details:
+
+Event Name: {{ event.name }}
+Event Date: {{ event.date|date:"F d, Y at h:i A" }}
+Ticket Type: {{ ticket.name }}
+Price: ${{ ticket.price }}
+Purchase Date: {{ purchase_date|date:"F d, Y" }}
+Order ID: #{{ purchased_ticket_id }}
+
+Please save this email for your records. Show this receipt at the event entrance.
+
+If you have any questions, please contact our support team.
+
+See you at the event!
+
+---
+This is an automated email.
