@@ -173,6 +173,8 @@ onMounted(async () => {
   padding: 8px 16px;
   font-size: 14px;
   transition: all 0.3s;
+  font-family: 'Inter', 'Helvetica Neue', Helvetica, 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
 }
 
 .category-tag:hover {

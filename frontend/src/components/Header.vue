@@ -9,7 +9,7 @@
       <template v-if="userStore.isLoggedIn">
         <el-button type="text" @click="goToSaved">Saved Events</el-button>
         |
-        <el-button type="text" @click="showPurchased">Purchased tickets</el-button>
+        <el-button type="text" @click="showPurchased">Purchased Tickets</el-button>
         |
         <span>{{ userStore.user?.username }}</span>
         <el-button type="text" @click="handleLogout">Logout</el-button>

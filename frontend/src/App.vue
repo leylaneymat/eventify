@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <Header />
-    <router-view />
+    <main class="content">
+      <router-view />
+    </main>
     <Footer />
   </div>
 </template>
@@ -16,6 +18,10 @@ import Footer from "@/components/Footer.vue"
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.content {
+  flex: 1;
 }
 
 /* Global styles can stay here if needed */
