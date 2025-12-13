@@ -34,7 +34,7 @@
         <el-table-column label="Ticket Name" prop="ticket.name" width="140" />
         <el-table-column label="Price" width="100">
           <template #default="scope">
-            ${{ scope.row.ticket.price }}
+            ₼{{ scope.row.ticket.price }}
           </template>
         </el-table-column>
         <el-table-column label="Purchase Date" width="180">
@@ -123,6 +123,11 @@ const registerForm = ref({
   confirmPassword: ''
 })
 
+const toErrorText = (error, fallback) => {
+  const detail = error?.response?.data?.detail || error?.message || 'Unknown error';
+  return `${fallback}: ${detail}`;
+};
+
 const openLoginModal = () => {
   loginDialogVisible.value = true
 }
@@ -146,7 +151,9 @@ const submitLogin = async () => {
     loginDialogVisible.value = false
 	  router.go(0);
   } else {
-    ElMessage.error('Login failed')
+    ElMessage.error(
+      toErrorText(userStore.lastError, 'Login failed')
+    )
   }
 }
 
@@ -177,7 +184,9 @@ const submitRegister = async () => {
     registerDialogVisible.value = false
     router.go(0);
   } else {
-    ElMessage.error('Registration failed')
+    ElMessage.error(
+      toErrorText(userStore.lastError, 'Registration failed')
+    )
   }
 }
 
@@ -217,7 +226,7 @@ const showPurchased = async () => {
       })
     }
   } catch (error) {
-    ElMessage.error('Failed to load purchased tickets')
+    ElMessage.error(toErrorText(error, 'Failed to load purchased tickets'))
     console.error(error)
   } finally {
     loading.value = false
