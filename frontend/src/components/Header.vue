@@ -78,6 +78,9 @@
         <el-form-item label="Username">
           <el-input v-model="registerForm.username" placeholder="Choose a username" />
         </el-form-item>
+        <el-form-item label="Email">
+          <el-input v-model="registerForm.email" type="email" placeholder="Enter your email" />
+        </el-form-item>
         <el-form-item label="Password">
           <el-input v-model="registerForm.password" type="password" placeholder="Create a password" show-password />
         </el-form-item>
@@ -115,6 +118,7 @@ const loginForm = ref({
 
 const registerForm = ref({
   username: '',
+  email: '',
   password: '',
   confirmPassword: ''
 })
@@ -147,10 +151,17 @@ const submitLogin = async () => {
 }
 
 const submitRegister = async () => {
-  const { username, password, confirmPassword } = registerForm.value
+  const { username, email, password, confirmPassword } = registerForm.value
 
-  if (!username || !password) {
-    ElMessage.error('Please enter username and password')
+  if (!username || !email || !password) {
+    ElMessage.error('Please fill in all fields')
+    return
+  }
+
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) {
+    ElMessage.error('Please enter a valid email address')
     return
   }
 
@@ -159,7 +170,7 @@ const submitRegister = async () => {
     return
   }
 
-  const success = await userStore.register(username, password)
+  const success = await userStore.register(username, email, password)
 
   if (success) {
     ElMessage.success('Registration successful')

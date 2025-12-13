@@ -54,10 +54,11 @@ export const useUserStore = defineStore("user", {
 			}
 		},
 
-		async register(username, password) {
+		async register(username, email, password) {
 			try {
 				await axios.post("http://localhost:8000/api/v1/users/", {
 					username,
+					email,
 					password,
 				});
 
