@@ -217,11 +217,11 @@ export default {
 
       try {
         if (!props.event.isLiked) {
-          const response = await axios.post(`http://localhost:8000/api/v1/events/${props.event.id}/likes/`);
+          const response = await axios.post(`/api/v1/events/${props.event.id}/likes/`);
           localStorage.setItem('likeObj', JSON.stringify(response.data));
         } else {
           let likeObj = JSON.parse(localStorage.getItem('likeObj'));
-          await axios.delete(`http://localhost:8000/api/v1/events/${props.event.id}/likes/${likeObj.id}/`);
+          await axios.delete(`/api/v1/events/${props.event.id}/likes/${likeObj.id}/`);
           localStorage.removeItem('likeObj');
         }
 
@@ -231,12 +231,12 @@ export default {
         let likeObj = JSON.parse(localStorage.getItem('likeObj')) || null;
 
         if (!likeObj) {
-          const response = await axios.get(`http://localhost:8000/api/v1/events/${props.event.id}/likes/`);
+          const response = await axios.get(`/api/v1/events/${props.event.id}/likes/`);
           const likes = response.data;
           likeObj = likes.find(like => like.user == userStore.user.id) || null;
         }
 
-        await axios.delete(`http://localhost:8000/api/v1/events/${props.event.id}/likes/${likeObj.id}/`);
+        await axios.delete(`/api/v1/events/${props.event.id}/likes/${likeObj.id}/`);
         props.event.likes = (props.event.likes || 0) - 1;
         localStorage.removeItem('likeObj');
       }
@@ -254,7 +254,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(`http://localhost:8000/api/v1/events/${props.event.id}/comments/`, {
+        const response = await axios.post(`/api/v1/events/${props.event.id}/comments/`, {
           text: newComment.value
         });
         props.event.comments.push(response.data);
@@ -287,7 +287,7 @@ export default {
       }
 
       try {
-        const response = await axios.post(`http://localhost:8000/api/v1/users/${userStore.user.id}/purchased_tickets/`, {
+        const response = await axios.post(`/api/v1/users/${userStore.user.id}/purchased_tickets/`, {
           event: props.event.id,
           ticket: selectedTicket.value
         });
