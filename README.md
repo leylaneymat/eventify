@@ -1,6 +1,6 @@
-# Eventify Project Documentation
+# Project Documentation
 
-## Project Overview
+## Overview
 
 **Eventify** is a comprehensive web application designed to streamline the process of discovering, comparing, and purchasing tickets for upcoming events. The platform facilitates a smooth user experience by allowing users to:
 
@@ -49,8 +49,22 @@ Once the application is running, you can access it in your web browser:
 - **Eventify Web App:** http://localhost:8080  
 - **Admin Panel:** http://localhost:8000/admin  
 
----
-
-Admin Credentials are as follows:
+Admin credentials are as follows:
 - **Username:** admin  
 - **Password:** 123
+
+## Email Receipt Configuration for Ticket Purchases
+
+To enable email receipts for ticket purchases, a **Gmail** account is required. Configure it using the steps below:
+
+1. Set the sender email address by adding your email to `EMAIL_HOST_USER`  
+   _(search for this variable in the project)_.
+
+2. Generate a Google App Password:
+   - Go to https://myaccount.google.com/apppasswords
+   - Create an app password
+   - Copy the generated password
+
+3. Add the generated password to `EMAIL_HOST_PASSWORD`.
+
+After completing these steps, clicking **Send Receipt** in the **Purchased Tickets** window will send the receipt from the specified email address.
