@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
@@ -67,12 +69,10 @@ def get_user_by_username(request, username):
 def send_ticket_receipt(request, purchased_ticket_id):
     """Send receipt email for a purchased ticket"""
     try:
-        # Get the purchased ticket
         purchased_ticket = PurchasedTicket.objects.select_related(
             "user", "event", "ticket"
         ).get(id=purchased_ticket_id, user=request.user)
 
-        # Get user email
         user_email = request.user.email
         if not user_email:
             return Response(
@@ -80,7 +80,6 @@ def send_ticket_receipt(request, purchased_ticket_id):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Prepare email context
         context = {
             "user": request.user,
             "event": purchased_ticket.event,
@@ -89,12 +88,10 @@ def send_ticket_receipt(request, purchased_ticket_id):
             "purchased_ticket_id": purchased_ticket.id,
         }
 
-        # Render email template
         subject = f"Ticket Receipt - {purchased_ticket.event.name}"
         html_message = render_to_string("emails/ticket_receipt.html", context)
         plain_message = render_to_string("emails/ticket_receipt.txt", context)
 
-        # Send email
         send_mail(
             subject=subject,
             message=plain_message,
@@ -105,12 +102,28 @@ def send_ticket_receipt(request, purchased_ticket_id):
         )
 
         return Response(
-            {"message": f"Receipt sent to {user_email}"}, status=status.HTTP_200_OK
+            {"message": f"Receipt sent to {user_email}"},
+            status=status.HTTP_200_OK,
         )
 
     except PurchasedTicket.DoesNotExist:
         return Response(
-            {"error": "Purchased ticket not found"}, status=status.HTTP_404_NOT_FOUND
+            {"error": "Purchased ticket not found"},
+            status=status.HTTP_404_NOT_FOUND,
         )
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    except Exception:
+        # 👇 Logs full traceback to console
+        logger = logging.getLogger(__name__)
+        logger.exception(
+            "Failed to send ticket receipt",
+            extra={
+                "user_id": request.user.id,
+                "purchased_ticket_id": purchased_ticket_id,
+            },
+        )
+
+        return Response(
+            {"error": "Internal server error"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
