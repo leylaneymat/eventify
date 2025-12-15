@@ -25,7 +25,7 @@ export const useUserStore = defineStore("user", {
 				axios.defaults.headers.common["Authorization"] =
 					`Bearer ${this.accessToken}`;
 
-				const userData = (await axios.get(`/api/v1/users/${username}/`))
+				const userData = (await axios.get(`/api/v1/users/${username.trim()}/`))
 					.data;
 
 				this.user = {
