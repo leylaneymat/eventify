@@ -125,6 +125,7 @@ const registerForm = ref({
 })
 
 const toErrorText = (error, fallback) => {
+  if (typeof error === "string") return `${fallback}: ${error}`;
   const detail = error?.response?.data?.detail || error?.message || 'Unknown error';
   return `${fallback}: ${detail}`;
 };

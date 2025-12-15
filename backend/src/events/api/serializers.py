@@ -45,7 +45,7 @@ class EventSerializer(serializers.ModelSerializer):
             "comments",
             "likes",
             "is_liked",
-            "category",  # <-- added here
+            "category",
         )
 
     def get_likes(self, obj):
@@ -63,7 +63,6 @@ class EventSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         tickets_data = validated_data.pop("tickets", None)
-        # If category is included in validated_data it will be present here
         event = Event.objects.create(**validated_data)
 
         if tickets_data:
@@ -96,7 +95,6 @@ class SavedEventSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "saved_at"]
 
     def get_event(self, obj):
-        # Import your existing EventSerializer here
         from events.api.serializers import EventSerializer
 
         return EventSerializer(obj.event, context=self.context).data
@@ -128,7 +126,6 @@ class SavedEventListSerializer(serializers.ModelSerializer):
         fields = ["id", "event", "saved_at"]
 
     def get_event(self, obj):
-        # Import your existing EventSerializer here
         from events.api.serializers import EventSerializer
 
         return EventSerializer(obj.event, context=self.context).data

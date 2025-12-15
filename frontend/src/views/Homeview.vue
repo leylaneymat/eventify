@@ -54,14 +54,12 @@ const categories = ref([])
 const selectedCategory = ref(null)
 const loading = ref(true)
 
-// utility: make label pretty (e.g. "concert" -> "Concert")
 const prettyLabel = (val) => {
   if (!val || typeof val !== "string") return String(val)
   return val.charAt(0).toUpperCase() + val.slice(1)
 }
 
 const normalizeCategories = (raw) => {
-  // Expecting either: ['concert','festival'] or [{value:'concert', label:'Concert'}, ...]
   const seen = new Set()
   const out = []
 
@@ -73,7 +71,6 @@ const normalizeCategories = (raw) => {
       value = item
       label = prettyLabel(item)
     } else if (item && typeof item === "object") {
-      // item could be {value, label} or {key:...}
       value = item.value ?? item.key ?? item.name
       label = item.label ?? item.name ?? prettyLabel(value)
     }
@@ -112,7 +109,6 @@ const filterByCategory = async (category) => {
       ? `/api/v1/events/?category=${encodeURIComponent(category)}`
       : '/api/v1/events/'
     const res = await api.get(url)
-    // If the API returns an object (pagination) like { results: [...] }, handle both cases:
     const fetched = Array.isArray(res.data) ? res.data : (res.data.results ?? [])
     events.value = mapEventList(fetched)
   } catch (err) {
@@ -127,7 +123,6 @@ const loadCategories = async () => {
   try {
     const res = await api.get('/api/v1/events/categories/')
     let raw = res.data
-    // normalize into objects {value,label}
     let normalized = normalizeCategories(raw)
     normalized = ensureOtherPresent(normalized)
     categories.value = normalized

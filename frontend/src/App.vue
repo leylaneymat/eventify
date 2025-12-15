@@ -24,5 +24,4 @@ import Footer from "@/components/Footer.vue"
   flex: 1;
 }
 
-/* Global styles can stay here if needed */
 </style>

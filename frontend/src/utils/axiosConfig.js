@@ -7,7 +7,6 @@ const api = axios.create({
 
 export default api;
 
-// Attach the auth token (if present) to every request.
 export const setupAxiosInterceptors = () => {
   api.interceptors.request.use(
     config => {
@@ -21,7 +20,6 @@ export const setupAxiosInterceptors = () => {
   )
 }
 
-// Initialize axios defaults on app startup.
 export const initializeAuth = () => {
   const token = localStorage.getItem("accessToken")
   if (token) {

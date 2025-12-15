@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from events.api.serializers import (
     CommentSerializer,
-    EventSerializer,  # Make sure you import your serializer
+    EventSerializer, 
     LikeSerializer,
     SavedEventListSerializer,
     SavedEventSerializer,
@@ -111,7 +111,6 @@ class EventViewSet(viewsets.ModelViewSet):
         category = self.request.query_params.get("category")
         if not category:
             return qs
-        # allow comma-separated list: ?category=concert or ?category=concert,festival
         cats = [c.strip() for c in category.split(",") if c.strip()]
         return qs.filter(category__in=cats)
 
@@ -126,7 +125,6 @@ class EventCategoriesAPIView(APIView):
         categories = [
             {"value": value, "label": label} for value, label in Event.CATEGORY_CHOICES
         ]
-        # ensure "other" is present (usually it is if in choices)
         if not any(c["value"].lower() == "other" for c in categories):
             categories.append({"value": "other", "label": "Other"})
         return Response(categories)

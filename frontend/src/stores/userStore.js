@@ -60,11 +60,25 @@ export const useUserStore = defineStore("user", {
 				});
 
 				const success = await this.login(username, password);
-				this.lastError = success ? null : this.lastError;
+				this.lastError = null;
 				return success;
 			} catch (error) {
 				console.error("Registration failed", error);
-				this.lastError = error;
+
+				const data = error?.response?.data;
+
+				if (Array.isArray(data?.username) && data.username.length > 0) {
+					this.lastError = data.username[0];
+				} else if (
+					Array.isArray(data?.email) &&
+					data.email.length > 0
+				) {
+					this.lastError = data.email[0];
+				} else if (typeof data?.detail === "string") {
+					this.lastError = data.detail;
+				} else {
+					this.lastError = error;
+				}
 				return false;
 			}
 		},

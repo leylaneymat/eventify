@@ -380,7 +380,7 @@ export default {
 
 .event-title {
   flex: 1;
-  min-height: 48px; /* keep header height consistent for multi-line names */
+  min-height: 48px; 
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;

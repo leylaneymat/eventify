@@ -113,7 +113,6 @@ def send_ticket_receipt(request, purchased_ticket_id):
         )
 
     except Exception:
-        # 👇 Logs full traceback to console
         logger = logging.getLogger(__name__)
         logger.exception(
             "Failed to send ticket receipt",
