@@ -258,7 +258,7 @@ const sendReceipt = async (purchasedTicket) => {
 const handleLogout = () => {
   userStore.logout();
   ElMessage.success('Logged out successfully');
-  router.go(0);
+  window.location.href = "/";
 }
 
 const goToHome = () => {
