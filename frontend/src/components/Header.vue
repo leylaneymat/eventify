@@ -104,7 +104,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/userStore'
 import { ElMessage } from 'element-plus'
-import axios from 'axios';
+import axios from "@/utils/axiosConfig.js";
 
 const router = useRouter();
 const userStore = useUserStore()

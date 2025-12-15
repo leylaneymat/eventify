@@ -122,7 +122,7 @@ import { ref, onMounted, computed } from 'vue';
 import { ChatRound, Collection, CollectionTag } from '@element-plus/icons-vue';
 import HeartIcon from "@/components/HeartIcon.vue";
 import { useUserStore } from '@/stores/userStore';
-import axios from 'axios';
+import axios from "@/utils/axiosConfig.js";
 import { ElMessage } from 'element-plus';
 
 export default {
